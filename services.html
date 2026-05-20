@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servicios – Chía Segura</title>
+  <meta name="description" content="Conoce todas las funcionalidades y servicios de Chía Segura: reporte geolocalizado, mapa de calor, análisis estadístico y más." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <style>
+    .page-hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      padding: 120px 24px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    .page-hero__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero__title span { color: var(--orange); }
+    .page-hero__sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.75);
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── Service cards (large) ── */
+    .services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 48px;
+    }
+    .service-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 28px;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      align-items: flex-start;
+    }
+    .service-item:hover { transform: translateX(6px); box-shadow: var(--shadow-md); border-color: transparent; }
+    .service-item__icon {
+      width: 64px; height: 64px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .service-item__icon--blue   { background: var(--blue-light); }
+    .service-item__icon--orange { background: var(--orange-light); }
+    .service-item__icon--green  { background: var(--green-light); }
+    .service-item__content { flex: 1; }
+    .service-item__title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .service-item__desc {
+      font-size: .95rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .service-item__tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+    .tag--blue   { background: var(--blue-light);   color: var(--blue); }
+    .tag--orange { background: var(--orange-light);  color: var(--orange-dark); }
+    .tag--green  { background: var(--green-light);   color: var(--green); }
+
+    /* ── How it works ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 32px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: var(--gray-200);
+      z-index: 0;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step__number {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(11,31,58,.25);
+    }
+    .step:nth-child(2) .step__number { background: var(--blue); }
+    .step:nth-child(3) .step__number { background: var(--orange); }
+    .step:nth-child(4) .step__number { background: var(--green); }
+    .step__title  { font-size: .95rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+    .step__desc   { font-size: .82rem; color: var(--gray-500); line-height: 1.55; }
+
+    /* ── CTA banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      border-radius: var(--radius-xl);
+      padding: 56px 40px;
+      text-align: center;
+      margin-top: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .cta-banner__title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .cta-banner__sub {
+      color: rgba(255,255,255,.7);
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    @media (max-width: 900px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .steps::before { display: none; }
+      .service-item { grid-template-columns: 1fr; }
+      .service-item__icon { width: 52px; height: 52px; }
+    }
+    @media (max-width: 600px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu">
+        <li><a class="navbar__link" href="index.html">Inicio</a></li>
+        <li><a class="navbar__link" href="about.html">Nosotros</a></li>
+        <li><a class="navbar__link" href="services.html">Servicios</a></li>
+        <li><a class="navbar__link" href="heatmap.html">Mapa de Calor</a></li>
+        <li><a class="navbar__link" href="contact.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <section class="page-hero">
+    <h1 class="page-hero__title">Nuestros <span>Servicios</span></h1>
+    <p class="page-hero__sub">Todo lo que Chía Segura ofrece para mantener a tu comunidad informada y protegida.</p>
+  </section>
+
+  <!-- ═══ SERVICIOS ═══ -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section__title">Funcionalidades Disponibles</h2>
+      <p class="section__subtitle">Diseñadas para ciudadanos, por ciudadanos</p>
+
+      <div class="services-list">
+
+        <div class="service-item">
+          <div class="service-item__icon service-item__icon--blue">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="service-item__content">
+            <h3 class="service-item__title">Reporte Geolocalizado de Incidentes</h3>
+            <p class="service-item__desc">
+              Reporta cualquier incidente de seguridad desde tu dispositivo móvil o computador. 
+              Selecciona la ubicación exacta en el mapa interactivo o usa el GPS de tu dispositivo 
+              para una geolocalización precisa. Aporta descripción, tipo de delito y datos de contacto.
+            </p>
+            <div class="service-item__tags">
+              <span class="tag tag--blue">GPS integrado</span>
+              <span class="tag tag--blue">Mini-mapa</span>
+              <span class="tag tag--blue">Formulario validado</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-item__icon service-item__icon--orange">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>
+            </svg>
+          </div>
+          <div class="service-item__content">
+            <h3 class="service-item__title">Mapa de Calor Delictivo</h3>
+            <p class="service-item__desc">
+              Visualiza en tiempo real la concentración de incidentes en el mapa de Chía. 
+              Filtra por tipo de delito (hurto, atraco, vandalismo, accidente) y observa las 
+              zonas de mayor riesgo. Los datos persisten y se actualizan con cada nuevo reporte ciudadano.
+            </p>
+            <div class="service-item__tags">
+              <span class="tag tag--orange">Tiempo real</span>
+              <span class="tag tag--orange">Filtros por tipo</span>
+              <span class="tag tag--orange">Leaflet.js</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-item__icon service-item__icon--green">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="service-item__content">
+            <h3 class="service-item__title">Panel de Incidentes Recientes</h3>
+            <p class="service-item__desc">
+              Consulta la lista actualizada de todos los incidentes reportados con su dirección, 
+              tipo de delito, descripción y fecha. Haz clic en cualquier incidente para resaltar 
+              su ubicación en el mapa de calor.
+            </p>
+            <div class="service-item__tags">
+              <span class="tag tag--green">Historial completo</span>
+              <span class="tag tag--green">Navegación rápida</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-item__icon service-item__icon--blue">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="service-item__content">
+            <h3 class="service-item__title">Seguridad y Privacidad de Datos</h3>
+            <p class="service-item__desc">
+              Toda la información se transmite cifrada bajo protocolos HTTPS/TLS. 
+              Contamos con integración opcional a Firebase Firestore para almacenamiento seguro 
+              en la nube y sistema de autenticación para el panel de administración.
+            </p>
+            <div class="service-item__tags">
+              <span class="tag tag--blue">HTTPS/TLS</span>
+              <span class="tag tag--blue">Firebase Auth</span>
+              <span class="tag tag--blue">Firestore</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-item__icon service-item__icon--orange">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div class="service-item__content">
+            <h3 class="service-item__title">Notificaciones por Email</h3>
+            <p class="service-item__desc">
+              Cada reporte puede generar una notificación automática a las autoridades o administradores 
+              mediante integración con EmailJS. El formulario de contacto también permite la comunicación 
+              directa con el equipo de Chía Segura.
+            </p>
+            <div class="service-item__tags">
+              <span class="tag tag--orange">EmailJS</span>
+              <span class="tag tag--orange">Notificaciones automáticas</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CÓMO FUNCIONA ═══ -->
+  <section class="section section--light">
+    <div class="container">
+      <h2 class="section__title">¿Cómo Funciona?</h2>
+      <p class="section__subtitle">En 4 simples pasos</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step__number">1</div>
+          <div class="step__title">Detecta el incidente</div>
+          <div class="step__desc">Observas algo sospechoso o un delito en tu entorno en Chía.</div>
+        </div>
+        <div class="step">
+          <div class="step__number">2</div>
+          <div class="step__title">Abre Chía Segura</div>
+          <div class="step__desc">Ingresa al sitio web y haz clic en "Reportar Incidente".</div>
+        </div>
+        <div class="step">
+          <div class="step__number">3</div>
+          <div class="step__title">Completa el formulario</div>
+          <div class="step__desc">Ingresa los datos del incidente y marca la ubicación exacta en el mapa.</div>
+        </div>
+        <div class="step">
+          <div class="step__number">4</div>
+          <div class="step__title">¡Listo! Contribuiste</div>
+          <div class="step__desc">El reporte aparece en el mapa de calor y notifica a las autoridades.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═══ -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-banner">
+        <h2 class="cta-banner__title">¿Listo para reportar un incidente?</h2>
+        <p class="cta-banner__sub">Contribuye a la seguridad de Chía. Cada reporte cuenta.</p>
+        <a href="index.html#inicio" class="btn btn--orange">Ir a la página principal</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span>Chía Segura</span>
+      </div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2025 Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/toast.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/animations.js"></script>
+</body>
+</html>

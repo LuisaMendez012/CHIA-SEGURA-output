@@ -4,20 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chía Segura – Reporte Ciudadano en Tiempo Real</title>
+  <meta name="description" content="Plataforma digital de reporte ciudadano en tiempo real para Chía, Cundinamarca. Reporta incidentes, visualiza el mapa de calor delictivo y contribuye a la seguridad de tu municipio." />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- CSS Modules -->
+  <!-- CSS -->
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/navbar.css" />
   <link rel="stylesheet" href="css/hero.css" />
   <link rel="stylesheet" href="css/components.css" />
 
-  <!-- ── MINI-MAPA EN MODAL ── -->
+  <!-- Leaflet (mini-mapa en modal) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
   <style>
     /* ── Modal scrollable y más grande ── */
     .modal-backdrop .modal {
@@ -124,9 +126,7 @@
       font-family: 'Nunito', sans-serif;
       font-size: 11px; color: #94a3b8;
     }
-    .minimap-legend-dot {
-      width: 9px; height: 9px; border-radius: 50%;
-    }
+    .minimap-legend-dot { width: 9px; height: 9px; border-radius: 50%; }
     .minimap-legend-dot--pin { background: #f97316; }
     .minimap-legend-dot--confirmed { background: #4ade80; }
 
@@ -164,12 +164,10 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════
-       NAVBAR
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ NAVBAR ═══ -->
   <nav class="navbar" id="navbar">
     <div class="navbar__container">
-      <a class="navbar__brand" href="#">
+      <a class="navbar__brand" href="index.html">
         <div class="navbar__logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -179,12 +177,10 @@
       </a>
 
       <ul class="navbar__menu" id="navMenu">
-        <li><a class="navbar__link active" href="#inicio">Inicio</a></li>
-        <li><a class="navbar__link" href="#problema">El Problema</a></li>
-        <li><a class="navbar__link" href="#solucion">Nuestra Solución</a></li>
-        <li><a class="navbar__link" href="#funcionalidades">Funcionalidades</a></li>
-        <li><a class="navbar__link" href="#mapa">Mapa de Calor</a></li>
-        <li><a class="navbar__link" href="#contacto">Contacto</a></li>
+        <li><a class="navbar__link" href="#inicio">Inicio</a></li>
+        <li><a class="navbar__link" href="mapa.html">Mapa</a></li>
+        <li><a class="navbar__link" href="panico.html">Pánico</a></li>
+        <li><a class="navbar__link" href="contacto.html">Contacto</a></li>
       </ul>
 
       <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
@@ -193,9 +189,7 @@
     </div>
   </nav>
 
-  <!-- ═══════════════════════════════════════════
-       HERO
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ HERO ═══ -->
   <section class="hero" id="inicio">
     <div class="hero__overlay"></div>
     <div class="hero__content">
@@ -211,243 +205,102 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-       EL PROBLEMA
-  ═══════════════════════════════════════════ -->
+  <!-- Contenido principal reducido — enlaces a páginas dedicadas disponibles en el menú -->
+
+  <!-- ═══ PROBLEMA ═══ -->
   <section class="section" id="problema">
     <div class="container">
       <h2 class="section__title">El Problema</h2>
-      <div class="cards-grid">
+      <p class="section__subtitle">Contexto y cifras que muestran la necesidad de una plataforma de reporte ciudadano.</p>
 
+      <div class="cards-grid">
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--blue">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-              <line x1="6" y1="20" x2="6" y2="14"/>
-            </svg>
-          </div>
+          <div class="stat-card__icon stat-card__icon--blue">📊</div>
           <div class="stat-card__number stat-card__number--blue">1,866</div>
           <div class="stat-card__label">hurtos registrados en 2023</div>
           <div class="stat-card__source">Fuente: Policía Nacional</div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--orange">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
+          <div class="stat-card__icon stat-card__icon--orange">⚠️</div>
           <div class="stat-card__number stat-card__number--orange">17.3%</div>
           <div class="stat-card__label">percepción de seguridad de los ciudadanos</div>
           <div class="stat-card__source">Fuente: Encuesta de Convivencia y Seguridad</div>
         </div>
-
         <div class="stat-card">
-          <div class="stat-card__icon stat-card__icon--green">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-          </div>
+          <div class="stat-card__icon stat-card__icon--green">🔒</div>
           <div class="stat-card__number stat-card__number--green">Cifra Negra</div>
           <div class="stat-card__label">Muchos delitos no son denunciados</div>
           <div class="stat-card__source">Estadísticas no oficiales</div>
         </div>
-
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-       NUESTRA SOLUCIÓN
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ SOLUCIÓN ═══ -->
   <section class="section section--light" id="solucion">
     <div class="container">
-      <div class="solution-layout">
-        <div class="solution-layout__mockup">
-          <div class="phone-mockup">
-            <div class="phone-mockup__screen">
-              <div class="phone-screen__header">
-                <div class="phone-screen__dot"></div>
-                <div class="phone-screen__dot"></div>
-                <div class="phone-screen__dot"></div>
-              </div>
-              <div class="phone-screen__map">
-                <div class="phone-screen__pin">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#f97316" stroke="#f97316" stroke-width="1.5">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3" fill="#fff"/>
-                  </svg>
-                </div>
-                <div class="phone-screen__buildings">
-                  <div class="building building--tall"></div>
-                  <div class="building building--med"></div>
-                  <div class="building building--short"></div>
-                  <div class="building building--med2"></div>
-                </div>
-                <div class="phone-screen__trees">
-                  <div class="tree"></div>
-                  <div class="tree"></div>
-                  <div class="tree"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <h2 class="section__title">Nuestra Solución</h2>
+      <p class="section__subtitle">Chía Segura es una plataforma digital que permite reportar delitos en tiempo real con geolocalización.</p>
 
-        <div class="solution-layout__text">
-          <h2 class="solution-layout__title">Nuestra Solución</h2>
-          <p class="solution-layout__body">
-            Chía Segura es una plataforma digital que permite reportar delitos
-            en tiempo real con geolocalización, facilitando a las autoridades
-            actuar de manera rápida y eficiente mediante análisis de datos.
-          </p>
-          <ul class="solution-list">
-            <li class="solution-list__item">
-              <span class="solution-list__check">✔</span>
-              Reportes en tiempo real
-            </li>
-            <li class="solution-list__item">
-              <span class="solution-list__check">✔</span>
-              Geolocalización precisa
-            </li>
-            <li class="solution-list__item">
-              <span class="solution-list__check">✔</span>
-              Apoyo a la policía con datos inteligentes
-            </li>
-          </ul>
-        </div>
-      </div>
+      <ul class="solution-list" style="margin-bottom: 32px;">
+        <li class="solution-list__item">✓ Reportes en tiempo real</li>
+        <li class="solution-list__item">✓ Geolocalización precisa</li>
+        <li class="solution-list__item">✓ Apoyo a la policía con datos inteligentes</li>
+      </ul>
+
+      <p style="text-align: center; color: #6b7280; font-size: 1.05rem;">
+        Explicación del flujo del reporte: usuario → geolocalización → almacenamiento → visualización en mapas y envío a autoridades.
+      </p>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-       FUNCIONALIDADES CLAVE
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ FUNCIONALIDADES ═══ -->
   <section class="section" id="funcionalidades">
     <div class="container">
       <h2 class="section__title">Funcionalidades Clave</h2>
       <div class="features-grid">
-
         <div class="feature-card">
-          <div class="feature-card__icon feature-card__icon--blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-          </div>
+          <div class="feature-card__icon feature-card__icon--blue">📍</div>
           <div>
             <div class="feature-card__title">Reporte geolocalizado</div>
             <div class="feature-card__desc">Reporta incidentes desde cualquier lugar con ubicación precisa.</div>
           </div>
         </div>
-
         <div class="feature-card">
-          <div class="feature-card__icon feature-card__icon--orange">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/>
-            </svg>
-          </div>
+          <div class="feature-card__icon feature-card__icon--orange">🔥</div>
           <div>
             <div class="feature-card__title">Mapa de calor delictivo</div>
             <div class="feature-card__desc">Visualiza las zonas con mayor incidencia delictiva en mapas interactivos.</div>
           </div>
         </div>
-
         <div class="feature-card">
-          <div class="feature-card__icon feature-card__icon--green">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
+          <div class="feature-card__icon feature-card__icon--green">🔐</div>
           <div>
             <div class="feature-card__title">Seguridad de datos</div>
             <div class="feature-card__desc">Protegemos tu información con protocolos HTTPS/TLS.</div>
           </div>
         </div>
-
+        <div class="feature-card">
+          <div class="feature-card__icon feature-card__icon--blue">⚡</div>
+          <div>
+            <div class="feature-card__title">Tiempo real</div>
+            <div class="feature-card__desc">Los datos se actualizan instantáneamente para las autoridades.</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-       MAPA DE CALOR
-  ═══════════════════════════════════════════ -->
-  <section class="section" id="mapa">
+  <!-- ═══ CTA → Mapa de Calor ═══ -->
+  <section class="section section--light" style="text-align:center;">
     <div class="container">
-      <h2 class="section__title">Mapa de Calor de Incidentes</h2>
-      <p class="section__subtitle" style="text-align:center;color:#6b7280;margin-bottom:1.5rem;">
-        Visualiza en tiempo real los incidentes reportados por la comunidad en Chía, Cundinamarca.
-      </p>
-
-      <!-- Controles -->
-      <div class="heatmap-controls" id="heatmapControls">
-        <div class="heatmap-filter-group">
-          <label class="heatmap-filter-label">Filtrar por tipo:</label>
-          <div class="heatmap-filter-btns" id="filterBtns">
-            <button class="heatmap-filter-btn active" data-type="all">Todos</button>
-            <button class="heatmap-filter-btn" data-type="hurto">Hurto</button>
-            <button class="heatmap-filter-btn" data-type="atraco">Atraco</button>
-            <button class="heatmap-filter-btn" data-type="vandalismo">Vandalismo</button>
-            <button class="heatmap-filter-btn" data-type="accidente">Accidente</button>
-            <button class="heatmap-filter-btn" data-type="otro">Otro</button>
-          </div>
-        </div>
-        <div class="heatmap-stats" id="heatmapStats">
-          <span class="heatmap-stat-badge" id="totalCount">0 reportes</span>
-        </div>
-      </div>
-
-      <!-- Mapa -->
-      <div class="heatmap-wrapper">
-        <div id="chiaheatmap" style="width:100%;height:480px;border-radius:14px;z-index:1;"></div>
-      </div>
-
-      <!-- Lista de incidentes recientes -->
-      <div class="incidents-panel" id="incidentsPanel">
-        <h3 class="incidents-panel__title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Incidentes Reportados
-        </h3>
-        <div id="incidentsList" class="incidents-list">
-          <p class="incidents-empty" id="incidentsEmpty">Aún no hay incidentes reportados. ¡Sé el primero en reportar!</p>
-        </div>
-      </div>
+      <h2 class="section__title">¿Quieres ver el mapa de incidentes?</h2>
+      <p class="section__subtitle">Visualiza en tiempo real todos los reportes ciudadanos en Chía.</p>
+      <a href="mapa.html" class="btn btn--orange" style="margin-top:8px;">Ver Mapa de Calor</a>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-       CONTACTO
-  ═══════════════════════════════════════════ -->
-  <section class="section section--light" id="contacto">
-    <div class="container">
-      <h2 class="section__title">Contacto</h2>
-      <p class="section__subtitle">¿Tienes preguntas o sugerencias? Escríbenos.</p>
-      <div class="contact-form-wrapper">
-        <div class="contact-field">
-          <div class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <input type="email" class="form-input" placeholder="Tu correo electrónico" />
-        </div>
-        <div class="contact-field">
-          <div class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </div>
-          <textarea class="form-input form-textarea" placeholder="Tu mensaje"></textarea>
-        </div>
-        <button class="btn btn--orange btn--full" id="sendContact">Enviar Mensaje</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       FOOTER
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ FOOTER ═══ -->
   <footer class="footer">
     <div class="footer__container">
       <div class="footer__brand">
@@ -458,18 +311,15 @@
         </div>
         <span>Chía Segura</span>
       </div>
-      <div class="footer__center">
-        Facultad de Ingeniería – Universidad de Cundinamarca
-      </div>
-      <div class="footer__copy">
-        © 2025 Todos los derechos reservados
-      </div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2025 Todos los derechos reservados</div>
     </div>
   </footer>
 
-  <!-- ═══════════════════════════════════════════
-       MODAL – Reportar Incidente
-  ═══════════════════════════════════════════ -->
+  <!-- ═══ TOAST ═══ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══ MODAL – Reportar Incidente ═══ -->
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal__header">
@@ -527,7 +377,7 @@
           </div>
         </div>
 
-        <!-- UBICACIÓN: texto + mini-mapa opcional -->
+        <!-- UBICACIÓN -->
         <div class="modal-field">
           <div class="input-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -539,7 +389,6 @@
             </button>
           </div>
 
-          <!-- Mini-mapa de selección -->
           <div class="modal-minimap-panel" id="minimapPanel">
             <div class="minimap-toolbar">
               <div class="minimap-toolbar__hint">
@@ -548,12 +397,12 @@
               </div>
               <div class="minimap-toolbar__actions">
                 <button type="button" class="minimap-btn minimap-btn--gps" id="btnMinimapGPS">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
                   Mi ubicación
                 </button>
                 <button type="button" class="minimap-btn minimap-btn--clear" id="btnMinimapClear">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  Quitar pin
+                  Borrar pin
                 </button>
               </div>
             </div>
@@ -561,22 +410,21 @@
             <div class="minimap-legend">
               <div class="minimap-legend-item">
                 <div class="minimap-legend-dot minimap-legend-dot--pin"></div>
-                Pin colocado
+                Tu ubicación seleccionada
               </div>
               <div class="minimap-legend-item">
                 <div class="minimap-legend-dot minimap-legend-dot--confirmed"></div>
-                Ubicación confirmada
+                Incidentes previos
               </div>
             </div>
           </div>
 
-          <!-- Pill de confirmación -->
           <div class="location-confirmed-pill" id="locationPill">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-            Ubicación en mapa seleccionada
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Ubicación marcada en el mapa
             <span class="location-confirmed-pill__coords" id="pillCoords"></span>
-            <button type="button" class="location-confirmed-pill__edit" id="btnEditLocation">Editar</button>
-            <button type="button" class="location-confirmed-pill__del" id="btnDeleteLocation" title="Eliminar ubicación del mapa">
+            <button type="button" class="location-confirmed-pill__edit" id="btnPillEdit">Editar</button>
+            <button type="button" class="location-confirmed-pill__del" id="btnPillDel" title="Eliminar pin">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
@@ -596,459 +444,20 @@
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast"></div>
-
-  <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- ═══ SCRIPTS ═══ -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <!-- Firebase (opcional) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="config/firebase.js"></script>
+  <!-- EmailJS (opcional) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="config/emailjs.js"></script>
 
-  <!-- JS Modules externos -->
+  <script src="js/toast.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/animations.js"></script>
   <script src="js/modal.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/email.js"></script>
-
-  <!-- ═══════════════════════════════════════════
-       LÓGICA PRINCIPAL: Mini-mapa + Mapa de calor
-  ═══════════════════════════════════════════ -->
-  <script>
-  (function () {
-    'use strict';
-
-    /* ──────────────────────────────────────
-       STORE de incidentes (localStorage)
-    ────────────────────────────────────── */
-    const STORE_KEY = 'chia_segura_incidents';
-
-    function loadIncidents() {
-      try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
-      catch { return []; }
-    }
-
-    function saveIncidents(list) {
-      localStorage.setItem(STORE_KEY, JSON.stringify(list));
-    }
-
-    /* ──────────────────────────────────────
-       COORDENADAS CHÍA
-    ────────────────────────────────────── */
-    const CHIA_CENTER = [4.8647, -74.0367];
-    const CHIA_ZOOM   = 14;
-
-    /* ──────────────────────────────────────
-       MAPA DE CALOR PRINCIPAL
-    ────────────────────────────────────── */
-    let heatmapMap     = null;
-    let heatLayer      = null;
-    let heatMarkers    = [];
-    let activeFilter   = 'all';
-    let allIncidents   = loadIncidents();
-
-    function initHeatmap() {
-      const el = document.getElementById('chiaheatmap');
-      if (!el || heatmapMap) return;
-
-      heatmapMap = L.map('chiaheatmap', { zoomControl: true }).setView(CHIA_CENTER, CHIA_ZOOM);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap © CARTO', maxZoom: 19
-      }).addTo(heatmapMap);
-
-      renderHeatmap();
-    }
-
-    function renderHeatmap() {
-      if (!heatmapMap) return;
-
-      // Limpiar capas anteriores
-      if (heatLayer) { heatmapMap.removeLayer(heatLayer); heatLayer = null; }
-      heatMarkers.forEach(m => heatmapMap.removeLayer(m));
-      heatMarkers = [];
-
-      const filtered = activeFilter === 'all'
-        ? allIncidents
-        : allIncidents.filter(i => i.type === activeFilter);
-
-      // Sólo los que tienen coordenadas
-      const withCoords = filtered.filter(i => i.lat && i.lng);
-
-      // Capa de calor
-      if (withCoords.length > 0) {
-        const points = withCoords.map(i => [i.lat, i.lng, 0.8]);
-        heatLayer = L.heatLayer(points, {
-          radius: 35, blur: 25, maxZoom: 17,
-          gradient: { 0.2: '#22c55e', 0.5: '#f59e0b', 0.8: '#ef4444', 1: '#7f1d1d' }
-        }).addTo(heatmapMap);
-      }
-
-      // Marcadores individuales (popup readonly)
-      withCoords.forEach(inc => {
-        const typeColors = { hurto:'#ef4444', atraco:'#f97316', vandalismo:'#a855f7', accidente:'#3b82f6', otro:'#6b7280' };
-        const color = typeColors[inc.type] || '#6b7280';
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="width:12px;height:12px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.7);box-shadow:0 2px 8px rgba(0,0,0,0.5);"></div>`,
-          iconSize: [12, 12], iconAnchor: [6, 6]
-        });
-        const m = L.marker([inc.lat, inc.lng], { icon })
-          .bindPopup(`
-            <div style="font-family:'Nunito',sans-serif;min-width:160px;">
-              <div style="font-weight:800;color:#f97316;margin-bottom:4px;">${capitalize(inc.type)}</div>
-              <div style="font-size:12px;color:#374151;margin-bottom:2px;">📍 ${inc.address || 'Sin dirección'}</div>
-              <div style="font-size:11px;color:#6b7280;">${new Date(inc.ts).toLocaleString('es-CO')}</div>
-            </div>`)
-          .addTo(heatmapMap);
-        heatMarkers.push(m);
-      });
-
-      // Contador
-      const badge = document.getElementById('totalCount');
-      if (badge) badge.textContent = `${filtered.length} reporte${filtered.length !== 1 ? 's' : ''}`;
-
-      // Lista de incidentes
-      renderIncidentsList(filtered);
-    }
-
-    function renderIncidentsList(list) {
-      const listEl  = document.getElementById('incidentsList');
-      const emptyEl = document.getElementById('incidentsEmpty');
-      if (!listEl) return;
-
-      // Limpiar items anteriores (dejar el empty)
-      listEl.querySelectorAll('.incident-item').forEach(el => el.remove());
-
-      if (list.length === 0) {
-        if (emptyEl) emptyEl.style.display = '';
-        return;
-      }
-      if (emptyEl) emptyEl.style.display = 'none';
-
-      const typeLabel = { hurto:'Hurto', atraco:'Atraco', vandalismo:'Vandalismo', accidente:'Accidente', otro:'Otro' };
-      const typeColor = { hurto:'#ef4444', atraco:'#f97316', vandalismo:'#a855f7', accidente:'#3b82f6', otro:'#6b7280' };
-
-      [...list].reverse().slice(0, 10).forEach(inc => {
-        const div = document.createElement('div');
-        div.className = 'incident-item';
-        div.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.07);';
-        div.innerHTML = `
-          <div style="width:10px;height:10px;border-radius:50%;background:${typeColor[inc.type]||'#6b7280'};margin-top:4px;flex-shrink:0;"></div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1e293b;">${typeLabel[inc.type]||inc.type}</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:12px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${inc.address||'Sin dirección'}</div>
-            <div style="font-family:'Nunito',sans-serif;font-size:11px;color:#94a3b8;">${new Date(inc.ts).toLocaleString('es-CO')}</div>
-          </div>`;
-        listEl.appendChild(div);
-      });
-    }
-
-    // Filtros
-    document.addEventListener('click', function(e) {
-      const btn = e.target.closest('.heatmap-filter-btn');
-      if (!btn) return;
-      document.querySelectorAll('.heatmap-filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeFilter = btn.dataset.type;
-      renderHeatmap();
-    });
-
-    /* ──────────────────────────────────────
-       MINI-MAPA EN MODAL
-    ────────────────────────────────────── */
-    let miniMap      = null;
-    let miniPin      = null;
-    let selectedLat  = null;
-    let selectedLng  = null;
-    let minimapOpen  = false;
-
-    const btnToggle  = document.getElementById('btnToggleMinimap');
-    const panel      = document.getElementById('minimapPanel');
-    const pill       = document.getElementById('locationPill');
-    const pillCoords = document.getElementById('pillCoords');
-    const btnGPS     = document.getElementById('btnMinimapGPS');
-    const btnClear   = document.getElementById('btnMinimapClear');
-    const btnEdit    = document.getElementById('btnEditLocation');
-    const btnDel     = document.getElementById('btnDeleteLocation');
-    const addrInput  = document.getElementById('reportAddress');
-
-    function initMiniMap() {
-      if (miniMap) return;
-      miniMap = L.map('modal-minimap', { zoomControl: true }).setView(CHIA_CENTER, CHIA_ZOOM);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap © CARTO', maxZoom: 19
-      }).addTo(miniMap);
-
-      miniMap.on('click', function(e) {
-        placePin(e.latlng.lat, e.latlng.lng);
-      });
-    }
-
-    function placePin(lat, lng) {
-      selectedLat = lat;
-      selectedLng = lng;
-
-      if (miniPin) miniMap.removeLayer(miniPin);
-
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="
-          width:22px;height:22px;border-radius:50% 50% 50% 0;
-          background:#f97316;border:3px solid #fff;
-          transform:rotate(-45deg);box-shadow:0 3px 12px rgba(249,115,22,0.7);"></div>`,
-        iconSize: [22, 22], iconAnchor: [11, 22]
-      });
-      miniPin = L.marker([lat, lng], { icon, draggable: true }).addTo(miniMap);
-      miniPin.on('dragend', function(ev) {
-        const pos = ev.target.getLatLng();
-        selectedLat = pos.lat;
-        selectedLng = pos.lng;
-        updatePill();
-      });
-
-      updatePill();
-    }
-
-    function updatePill() {
-      if (selectedLat === null) {
-        pill.classList.remove('visible');
-        return;
-      }
-      pill.classList.add('visible');
-      pillCoords.textContent = `${selectedLat.toFixed(5)}, ${selectedLng.toFixed(5)}`;
-    }
-
-    function openMinimap() {
-      minimapOpen = true;
-      panel.classList.add('visible');
-      btnToggle.classList.add('active');
-      pill.classList.remove('visible');
-      setTimeout(() => {
-        initMiniMap();
-        miniMap.invalidateSize();
-        // Si ya hay pin, recentrar
-        if (selectedLat) miniMap.setView([selectedLat, selectedLng], CHIA_ZOOM);
-      }, 60);
-    }
-
-    function closeMinimap() {
-      minimapOpen = false;
-      panel.classList.remove('visible');
-      btnToggle.classList.remove('active');
-      if (selectedLat !== null) updatePill();
-    }
-
-    if (btnToggle) {
-      btnToggle.addEventListener('click', function() {
-        minimapOpen ? closeMinimap() : openMinimap();
-      });
-    }
-
-    if (btnGPS) {
-      btnGPS.addEventListener('click', function() {
-        if (!navigator.geolocation) { showToast('Geolocalización no disponible en este dispositivo', 'error'); return; }
-
-        // Estado de carga
-        const originalHTML = btnGPS.innerHTML;
-        btnGPS.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Localizando…`;
-        btnGPS.disabled = true;
-        btnGPS.style.opacity = '0.7';
-
-        const style = document.createElement('style');
-        style.id = 'gps-spin-style';
-        style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-        if (!document.getElementById('gps-spin-style')) document.head.appendChild(style);
-
-        navigator.geolocation.getCurrentPosition(
-          function(pos) {
-            // Restaurar botón
-            btnGPS.innerHTML = originalHTML;
-            btnGPS.disabled = false;
-            btnGPS.style.opacity = '';
-
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const accuracy = pos.coords.accuracy; // metros
-
-            // Volar a la ubicación real con zoom alto
-            miniMap.flyTo([lat, lng], 17, { animate: true, duration: 1.2 });
-
-            // Mostrar círculo de precisión
-            const accuracyCircle = L.circle([lat, lng], {
-              radius: accuracy,
-              color: '#2563eb',
-              fillColor: '#3b82f6',
-              fillOpacity: 0.12,
-              weight: 2,
-              dashArray: '4 4'
-            }).addTo(miniMap);
-
-            // Poner pin
-            placePin(lat, lng);
-
-            // Quitar círculo de precisión después de 4 segundos
-            setTimeout(() => {
-              if (miniMap) miniMap.removeLayer(accuracyCircle);
-            }, 4000);
-
-            showToast(`📍 Ubicación encontrada (precisión ±${Math.round(accuracy)}m)`, 'success');
-          },
-          function(err) {
-            btnGPS.innerHTML = originalHTML;
-            btnGPS.disabled = false;
-            btnGPS.style.opacity = '';
-
-            const msgs = {
-              1: 'Permiso de ubicación denegado. Actívalo en tu navegador.',
-              2: 'No se pudo determinar la ubicación.',
-              3: 'Tiempo de espera agotado. Intenta de nuevo.'
-            };
-            showToast(msgs[err.code] || 'Error al obtener ubicación', 'error');
-          },
-          { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-        );
-      });
-    }
-
-    if (btnClear) {
-      btnClear.addEventListener('click', function() {
-        if (miniPin) { miniMap.removeLayer(miniPin); miniPin = null; }
-        selectedLat = null; selectedLng = null;
-        updatePill();
-      });
-    }
-
-    if (btnEdit) {
-      btnEdit.addEventListener('click', function() { openMinimap(); });
-    }
-
-    if (btnDel) {
-      btnDel.addEventListener('click', function() {
-        if (miniPin && miniMap) { miniMap.removeLayer(miniPin); miniPin = null; }
-        selectedLat = null; selectedLng = null;
-        pill.classList.remove('visible');
-      });
-    }
-
-    /* ──────────────────────────────────────
-       MODAL: abrir / cerrar
-    ────────────────────────────────────── */
-    const openModalBtn  = document.getElementById('openModal');
-    const closeModalBtn = document.getElementById('closeModal');
-    const backdrop      = document.getElementById('modalBackdrop');
-
-    function openModal() {
-      backdrop.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal() {
-      backdrop.classList.remove('active');
-      document.body.style.overflow = '';
-      // Cerrar mini-mapa sin borrar pin
-      if (minimapOpen) { panel.classList.remove('visible'); btnToggle.classList.remove('active'); minimapOpen = false; }
-    }
-
-    if (openModalBtn)  openModalBtn.addEventListener('click', openModal);
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (backdrop)      backdrop.addEventListener('click', function(e) { if (e.target === backdrop) closeModal(); });
-
-    /* ──────────────────────────────────────
-       SUBMIT: guardar + actualizar mapa calor
-    ────────────────────────────────────── */
-    const submitBtn = document.getElementById('submitReport');
-    if (submitBtn) {
-      submitBtn.addEventListener('click', function() {
-        const name    = document.getElementById('reportName')?.value.trim();
-        const last    = document.getElementById('reportLastName')?.value.trim();
-        const cedula  = document.getElementById('reportCedula')?.value.trim();
-        const email   = document.getElementById('reportEmail')?.value.trim();
-        const type    = document.getElementById('reportType')?.value;
-        const address = addrInput?.value.trim();
-        const desc    = document.getElementById('reportDesc')?.value.trim();
-
-        if (!name || !last || !cedula || !email || !type || !address || !desc) {
-          showToast('Por favor completa todos los campos obligatorios.', 'error');
-          return;
-        }
-
-        const incident = {
-          id: Date.now(),
-          name, last, cedula, email, type, address, desc,
-          lat: selectedLat,
-          lng: selectedLng,
-          ts: Date.now()
-        };
-
-        allIncidents.push(incident);
-        saveIncidents(allIncidents);
-
-        // Actualizar mapa de calor
-        renderHeatmap();
-
-        // Reset form
-        ['reportName','reportLastName','reportCedula','reportEmail','reportDesc'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = '';
-        });
-        if (document.getElementById('reportType')) document.getElementById('reportType').value = '';
-        if (addrInput) addrInput.value = '';
-        if (miniPin && miniMap) { miniMap.removeLayer(miniPin); miniPin = null; }
-        selectedLat = null; selectedLng = null;
-        pill.classList.remove('visible');
-
-        closeModal();
-        showToast('¡Reporte enviado! Gracias por contribuir a Chía Segura.', 'success');
-
-        // Scroll suave al mapa de calor
-        setTimeout(() => {
-          document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' });
-        }, 600);
-      });
-    }
-
-    /* ──────────────────────────────────────
-       TOAST
-    ────────────────────────────────────── */
-    function showToast(msg, type) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.className = 'toast toast--' + (type || 'success') + ' toast--visible';
-      clearTimeout(toast._t);
-      toast._t = setTimeout(() => toast.classList.remove('toast--visible'), 3800);
-    }
-
-    /* ──────────────────────────────────────
-       NAVBAR scroll
-    ────────────────────────────────────── */
-    window.addEventListener('scroll', function() {
-      const nav = document.getElementById('navbar');
-      if (nav) nav.classList.toggle('navbar--scrolled', window.scrollY > 50);
-    });
-
-    const navToggle = document.getElementById('navToggle');
-    const navMenu   = document.getElementById('navMenu');
-    if (navToggle && navMenu) {
-      navToggle.addEventListener('click', () => navMenu.classList.toggle('open'));
-    }
-
-    /* ──────────────────────────────────────
-       UTILS
-    ────────────────────────────────────── */
-    function capitalize(str) {
-      if (!str) return '';
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    /* ──────────────────────────────────────
-       INIT cuando el DOM esté listo
-    ────────────────────────────────────── */
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initHeatmap);
-    } else {
-      initHeatmap();
-    }
-
-  })();
-  </script>
 </body>
 </html>

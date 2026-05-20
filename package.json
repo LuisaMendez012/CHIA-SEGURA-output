@@ -1,0 +1,25 @@
+{
+  "name": "chia-segura-output",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisaMendez012/CHIA-SEGURA-output.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LuisaMendez012/CHIA-SEGURA-output/issues"
+  },
+  "homepage": "https://github.com/LuisaMendez012/CHIA-SEGURA-output#readme",
+  "devDependencies": {
+    "serve": "^14.2.6"
+  }
+}

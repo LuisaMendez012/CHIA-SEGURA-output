@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funcionalidades – Chía Segura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html"><div class="navbar__logo-icon">...</div><span>Chía Segura</span></a>
+      <ul class="navbar__menu" id="navMenu">
+        <li><a class="navbar__link" href="index.html">Inicio</a></li>
+        <li><a class="navbar__link" href="mapa.html">Mapa</a></li>
+        <li><a class="navbar__link" href="panico.html">Pánico</a></li>
+        <li><a class="navbar__link" href="contacto.html">Contacto</a></li>
+      </ul>
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main style="padding:120px 24px 60px;">
+    <div class="container">
+      <h1 class="section__title">Funcionalidades Clave</h1>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-card__icon feature-card__icon--blue">...</div><div><div class="feature-card__title">Reporte geolocalizado</div><div class="feature-card__desc">Reporta incidentes desde cualquier lugar con ubicación precisa.</div></div></div>
+        <div class="feature-card"><div class="feature-card__icon feature-card__icon--orange">...</div><div><div class="feature-card__title">Mapa de calor delictivo</div><div class="feature-card__desc">Visualiza las zonas con mayor incidencia delictiva en mapas interactivos.</div></div></div>
+        <div class="feature-card"><div class="feature-card__icon feature-card__icon--green">...</div><div><div class="feature-card__title">Seguridad de datos</div><div class="feature-card__desc">Protegemos tu información con protocolos HTTPS/TLS.</div></div></div>
+        <div class="feature-card"><div class="feature-card__icon feature-card__icon--blue">...</div><div><div class="feature-card__title">Tiempo real</div><div class="feature-card__desc">Los datos se actualizan instantáneamente para las autoridades.</div></div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container"><div class="footer__brand">Chía Segura</div><div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div><div class="footer__copy">© 2025 Todos los derechos reservados</div></div>
+  </footer>
+
+  <script src="config/firebase.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/animations.js"></script>
+</body>
+</html>

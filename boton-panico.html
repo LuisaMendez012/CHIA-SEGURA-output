@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botón de Pánico – Chía Segura</title>
+
+  <!-- Google Fonts: Nunito (matches project) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ══════════════════════════════════════
+       CSS VARIABLES – matches Chía Segura
+    ══════════════════════════════════════ */
+    :root {
+      --orange:       #f97316;
+      --orange-dark:  #ea580c;
+      --orange-glow:  rgba(249,115,22,0.35);
+      --blue-dark:    #0f172a;
+      --blue-mid:     #1e293b;
+      --blue-card:    #1a2540;
+      --blue-border:  rgba(255,255,255,0.08);
+      --red:          #ef4444;
+      --red-dark:     #dc2626;
+      --red-glow:     rgba(239,68,68,0.45);
+      --green:        #22c55e;
+      --white:        #ffffff;
+      --text-main:    #f1f5f9;
+      --text-muted:   #94a3b8;
+      --text-dim:     #64748b;
+      --glass-bg:     rgba(30,41,59,0.65);
+      --glass-border: rgba(255,255,255,0.10);
+      --radius-lg:    16px;
+      --radius-xl:    24px;
+      --shadow-card:  0 8px 40px rgba(0,0,0,0.45);
+      --font:         'Nunito', sans-serif;
+      --transition:   all 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ══════════════════════════════════════
+       RESET & BASE
+    ══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--blue-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ══════════════════════════════════════
+       BACKGROUND MESH
+    ══════════════════════════════════════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(249,115,22,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(37,99,235,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(239,68,68,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════
+       NAVBAR
+    ══════════════════════════════════════ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(15,23,42,0.80);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--blue-border);
+      transition: var(--transition);
+    }
+    .navbar--scrolled {
+      background: rgba(15,23,42,0.97);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .navbar__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--white);
+      letter-spacing: -0.2px;
+    }
+    .navbar__logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px var(--orange-glow);
+      flex-shrink: 0;
+    }
+    .navbar__menu {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+      align-items: center;
+    }
+    .navbar__link {
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+    .navbar__link:hover,
+    .navbar__link.active {
+      color: var(--white);
+      background: rgba(255,255,255,0.08);
+    }
+    .navbar__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+    .navbar__badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .navbar__toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .navbar__toggle span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    @media (max-width: 768px) {
+      .navbar__menu {
+        display: none;
+        position: absolute;
+        top: 64px; left: 0; right: 0;
+        flex-direction: column;
+        background: rgba(15,23,42,0.98);
+        backdrop-filter: blur(14px);
+        padding: 16px;
+        gap: 4px;
+        border-bottom: 1px solid var(--blue-border);
+      }
+      .navbar__menu.open { display: flex; }
+      .navbar__toggle { display: flex; }
+    }
+
+    /* ══════════════════════════════════════
+       HERO
+    ══════════════════════════════════════ */
+    .hero {
+      position: relative;
+      padding: 120px 24px 60px;
+      text-align: center;
+      z-index: 1;
+    }
+    .hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: #fca5a5;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 5px 14px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero__title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+    .hero__title span { color: var(--orange); }
+    .hero__subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto 8px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════
+       LEGAL WARNING BANNER
+    ══════════════════════════════════════ */
+    .legal-banner {
+      position: relative;
+      z-index: 1;
+      max-width: 660px;
+      margin: 0 auto 48px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.22);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fcd34d;
+    }
+    .legal-banner__icon { flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       MAIN PANIC SECTION
+    ══════════════════════════════════════ */
+    .panic-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    /* ── Panic Button ── */
+    .panic-btn-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .panic-btn-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .panic-btn-ring {
+      position: relative;
+      width: 280px; height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animated rings */
+    .panic-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(239,68,68,0.25);
+      animation: ring-expand 2.4s ease-out infinite;
+    }
+    .panic-ring:nth-child(1) { width: 280px; height: 280px; animation-delay: 0s; }
+    .panic-ring:nth-child(2) { width: 260px; height: 260px; animation-delay: 0.6s; }
+    .panic-ring:nth-child(3) { width: 240px; height: 240px; animation-delay: 1.2s; }
+
+    @keyframes ring-expand {
+      0%   { transform: scale(0.85); opacity: 0.9; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    .panic-btn {
+      position: relative;
+      z-index: 2;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 35% 35%, #ff6b6b, #ef4444 40%, #dc2626 75%, #991b1b);
+      box-shadow:
+        0 0 0 6px rgba(239,68,68,0.15),
+        0 0 0 12px rgba(239,68,68,0.08),
+        0 20px 60px rgba(239,68,68,0.5),
+        inset 0 -4px 12px rgba(0,0,0,0.35),
+        inset 0 4px 10px rgba(255,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s cubic-bezier(0.4,0,0.2,1), box-shadow 0.15s ease;
+      animation: panic-pulse 2s ease-in-out infinite;
+      outline: none;
+    }
+    .panic-btn:hover {
+      transform: scale(1.04);
+      box-shadow:
+        0 0 0 8px rgba(239,68,68,0.2),
+        0 0 0 16px rgba(239,68,68,0.1),
+        0 28px 70px rgba(239,68,68,0.65),
+        inset 0 -4px 12px rgba(0,0,0,0.35),
+        inset 0 4px 10px rgba(255,255,255,0.15);
+    }
+    .panic-btn:active {
+      transform: scale(0.96);
+      animation: none;
+    }
+    .panic-btn.triggered {
+      animation: none;
+      background: radial-gradient(circle at 35% 35%, #fbbf24, #f59e0b 40%, #d97706 75%, #92400e);
+      box-shadow: 0 0 0 8px rgba(245,158,11,0.2), 0 28px 70px rgba(245,158,11,0.5);
+      cursor: not-allowed;
+    }
+
+    @keyframes panic-pulse {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(239,68,68,0.15), 0 0 0 12px rgba(239,68,68,0.08), 0 20px 60px rgba(239,68,68,0.5), inset 0 -4px 12px rgba(0,0,0,0.35); }
+      50%       { box-shadow: 0 0 0 10px rgba(239,68,68,0.22), 0 0 0 20px rgba(239,68,68,0.10), 0 28px 80px rgba(239,68,68,0.7), inset 0 -4px 12px rgba(0,0,0,0.35); }
+    }
+
+    .panic-btn__icon { color: #fff; opacity: 0.95; }
+    .panic-btn__text {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      line-height: 1.1;
+      text-align: center;
+    }
+    .panic-btn__sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ══════════════════════════════════════
+       LOADING OVERLAY
+    ══════════════════════════════════════ */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(10,15,28,0.88);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .loading-overlay.active { display: flex; }
+
+    .loading-spinner {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 4px solid rgba(239,68,68,0.15);
+      border-top-color: var(--red);
+      animation: spin 0.85s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .loading-dots span {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: dot-bounce 1.2s infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    .loading-progress {
+      width: 220px; height: 4px;
+      background: rgba(239,68,68,0.15);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .loading-progress__bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--orange));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+
+    /* ══════════════════════════════════════
+       ALERT PANEL (post-trigger)
+    ══════════════════════════════════════ */
+    .alert-panel {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      animation: slide-up 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    .alert-panel.active { display: block; }
+
+    @keyframes slide-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Alert header card ── */
+    .alert-header-card {
+      background: rgba(239,68,68,0.10);
+      border: 1.5px solid rgba(239,68,68,0.30);
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 40px rgba(239,68,68,0.15), var(--shadow-card);
+    }
+    .alert-header-card__icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 24px var(--red-glow);
+      flex-shrink: 0;
+      animation: icon-shake 0.5s ease both;
+    }
+    @keyframes icon-shake {
+      0%,100%{transform:rotate(0)} 20%{transform:rotate(-6deg)} 40%{transform:rotate(6deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)}
+    }
+    .alert-header-card__content { flex: 1; }
+    .alert-header-card__title {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .alert-header-card__subtitle {
+      font-size: 0.875rem;
+      color: #fca5a5;
+      font-weight: 700;
+    }
+    .alert-header-card__badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: #4ade80;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .alert-header-card__badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 1s infinite;
+    }
+
+    @media (max-width: 560px) {
+      .alert-header-card { flex-direction: column; text-align: center; }
+      .alert-header-card__badge { align-self: center; }
+    }
+
+    /* ── Stats row ── */
+    .alert-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 480px) {
+      .alert-stats { grid-template-columns: 1fr 1fr; }
+      .alert-stats .stat-card--wide { grid-column: 1 / -1; }
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-card);
+      animation: fade-in 0.6s ease both;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fade-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    .stat-card__label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .stat-card__value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-card__value--orange { color: var(--orange); }
+    .stat-card__value--green  { color: var(--green);  }
+    .stat-card__value--red    { color: #fca5a5;       }
+    .stat-card__meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+
+    /* ETA countdown */
+    .eta-countdown {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum';
+    }
+
+    /* Status dots row */
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      animation: fade-in 0.6s 0.35s ease both;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .status-pill--active {
+      background: rgba(34,197,94,0.1);
+      border-color: rgba(34,197,94,0.25);
+      color: #4ade80;
+    }
+    .status-pill--pending {
+      background: rgba(245,158,11,0.1);
+      border-color: rgba(245,158,11,0.25);
+      color: #fbbf24;
+    }
+    .status-pill--info {
+      background: rgba(59,130,246,0.1);
+      border-color: rgba(59,130,246,0.25);
+      color: #60a5fa;
+    }
+    .status-pill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1.2s infinite;
+    }
+
+    /* ── Map card ── */
+    .map-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+      animation: fade-in 0.6s 0.45s ease both;
+    }
+    .map-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(15,23,42,0.5);
+      border-bottom: 1px solid var(--blue-border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .map-card__title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 800;
+      color: var(--white);
+    }
+    .map-card__live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--green);
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.2);
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+    #response-map {
+      height: 300px;
+      width: 100%;
+    }
+    .map-card__footer {
+      padding: 10px 20px;
+      background: rgba(15,23,42,0.5);
+      border-top: 1px solid var(--blue-border);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Reset button ── */
+    .reset-btn-wrapper {
+      text-align: center;
+      animation: fade-in 0.6s 0.6s ease both;
+    }
+    .reset-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .reset-btn:hover {
+      background: rgba(255,255,255,0.09);
+      color: var(--white);
+    }
+
+    /* ══════════════════════════════════════
+       INFO CARDS (feature highlights)
+    ══════════════════════════════════════ */
+    .features-section {
+      position: relative;
+      z-index: 1;
+      padding: 20px 24px 80px;
+    }
+    .features-section__inner {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .features-section__title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 28px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      border-color: rgba(249,115,22,0.28);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.1);
+    }
+    .feature-card__icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-card__icon--red    { background: rgba(239,68,68,0.12); }
+    .feature-card__icon--blue   { background: rgba(37,99,235,0.12); }
+    .feature-card__icon--orange { background: rgba(249,115,22,0.12); }
+    .feature-card__icon--green  { background: rgba(34,197,94,0.12); }
+    .feature-card__title {
+      font-size: 0.925rem;
+      font-weight: 800;
+      color: var(--white);
+    }
+    .feature-card__desc {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════
+       LEGAL SECTION
+    ══════════════════════════════════════ */
+    .legal-section {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .legal-card {
+      background: rgba(245,158,11,0.06);
+      border: 1.5px solid rgba(245,158,11,0.18);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+    }
+    .legal-card__header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .legal-card__title {
+      font-size: 0.875rem;
+      font-weight: 900;
+      color: #fcd34d;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .legal-card__body {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #fde68a;
+      line-height: 1.65;
+    }
+    .legal-card__body strong { color: #fbbf24; }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    .footer {
+      position: relative;
+      z-index: 1;
+      background: rgba(15,23,42,0.8);
+      border-top: 1px solid var(--blue-border);
+      padding: 28px 24px;
+    }
+    .footer__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer__brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--white);
+    }
+    .footer__center {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-align: center;
+    }
+    .footer__copy {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    /* ══════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 700;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      max-width: 320px;
+      pointer-events: all;
+      transform: translateX(110%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+      opacity: 0;
+    }
+    .toast.visible { transform: translateX(0); opacity: 1; }
+    .toast.hiding  { transform: translateX(110%); opacity: 0; }
+
+    .toast--success {
+      background: rgba(22,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.28);
+      color: #4ade80;
+    }
+    .toast--error {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: #fca5a5;
+    }
+    .toast--info {
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.28);
+      color: #93c5fd;
+    }
+    .toast--warning {
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.28);
+      color: #fcd34d;
+    }
+    .toast__icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .toast__body { flex: 1; }
+    .toast__title { font-weight: 900; margin-bottom: 2px; font-size: 0.875rem; }
+    .toast__msg { font-size: 0.8rem; opacity: 0.85; font-weight: 600; }
+
+    /* ══════════════════════════════════════
+       LEAFLET OVERRIDES
+    ══════════════════════════════════════ */
+    .leaflet-popup-content-wrapper {
+      background: #1e293b !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #f1f5f9 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+      font-family: var(--font) !important;
+    }
+    .leaflet-popup-tip { background: #1e293b !important; }
+
+    /* ══════════════════════════════════════
+       UTILITIES
+    ══════════════════════════════════════ */
+    .container { max-width: 780px; margin: 0 auto; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════
+       NAVBAR
+  ═══════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span>Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu">
+        <li><a class="navbar__link" href="index.html#inicio">Inicio</a></li>
+        <li><a class="navbar__link" href="index.html#mapa">Mapa de Calor</a></li>
+        <li><a class="navbar__link active" href="#">Botón de Pánico</a></li>
+        <li>
+          <span class="navbar__badge">
+            <span class="navbar__badge-dot"></span>
+            DEMO
+          </span>
+        </li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════
+       HERO
+  ═══════════════════════════ -->
+  <section class="hero">
+    <div class="hero__eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Función de Emergencia Ciudadana
+    </div>
+    <h1 class="hero__title">
+      Botón de Pánico<br/>
+      <span>Chía Segura</span>
+    </h1>
+    <p class="hero__subtitle">
+      En caso de peligro inmediato, presiona el botón para notificar a la unidad de respuesta más cercana con tu ubicación en tiempo real.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════
+       LEGAL WARNING (top)
+  ═══════════════════════════ -->
+  <div style="position:relative;z-index:1;padding:0 24px;">
+    <div class="legal-banner container">
+      <div class="legal-banner__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <span>
+        <strong>Prototipo académico de visualización.</strong> No conectado a servicios oficiales de emergencia. Para emergencias reales llama al <strong>123</strong>.
+      </span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════
+       PANIC SECTION
+  ═══════════════════════════ -->
+  <section class="panic-section">
+    <div class="container" style="display:flex;flex-direction:column;align-items:center;gap:40px;">
+
+      <!-- Panic Button -->
+      <div class="panic-btn-wrapper" id="panicBtnWrapper">
+        <p class="panic-btn-label">Presiona solo en caso de emergencia</p>
+        <div class="panic-btn-ring">
+          <div class="panic-ring"></div>
+          <div class="panic-ring"></div>
+          <div class="panic-ring"></div>
+          <button
+            class="panic-btn"
+            id="panicBtn"
+            aria-label="Botón de pánico: presionar en emergencia"
+          >
+            <span class="panic-btn__icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </span>
+            <div class="panic-btn__text">¡EMERGENCIA!</div>
+            <div class="panic-btn__sub">Toca para alertar</div>
+          </button>
+        </div>
+        <p style="font-size:0.78rem;font-weight:700;color:var(--text-dim);text-align:center;max-width:240px;line-height:1.5;">
+          Se enviará tu ubicación GPS a la unidad de respuesta más cercana.
+        </p>
+      </div>
+
+      <!-- Alert Panel (hidden until triggered) -->
+      <div class="alert-panel" id="alertPanel">
+
+        <!-- Header -->
+        <div class="alert-header-card">
+          <div class="alert-header-card__icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="alert-header-card__content">
+            <div class="alert-header-card__title">🚔 Alerta enviada exitosamente</div>
+            <div class="alert-header-card__subtitle">Unidad de respuesta en camino a tu ubicación</div>
+          </div>
+          <div class="alert-header-card__badge">
+            <div class="alert-header-card__badge-dot"></div>
+            EN ATENCIÓN
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="alert-stats">
+          <div class="stat-card">
+            <div class="stat-card__label">Tiempo estimado</div>
+            <div class="stat-card__value stat-card__value--orange eta-countdown" id="etaDisplay">7:00</div>
+            <div class="stat-card__meta">minutos de llegada</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__label">Estado</div>
+            <div class="stat-card__value stat-card__value--green" style="font-size:1.05rem;">En camino</div>
+            <div class="stat-card__meta">Unidad asignada</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__label">Código de alerta</div>
+            <div class="stat-card__value stat-card__value--red" style="font-size:1.15rem;" id="alertCode">–</div>
+            <div class="stat-card__meta">Referencia de reporte</div>
+          </div>
+        </div>
+
+        <!-- Status pills -->
+        <div class="status-row">
+          <div class="status-pill status-pill--active">
+            <div class="status-pill-dot"></div>
+            Alerta recibida
+          </div>
+          <div class="status-pill status-pill--active">
+            <div class="status-pill-dot"></div>
+            Ubicación GPS confirmada
+          </div>
+          <div class="status-pill status-pill--pending">
+            <div class="status-pill-dot"></div>
+            Unidad en desplazamiento
+          </div>
+          <div class="status-pill status-pill--info">
+            <div class="status-pill-dot" style="animation:none;opacity:0.5;"></div>
+            Apoyo adicional en espera
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="map-card">
+          <div class="map-card__header">
+            <div class="map-card__title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Rastreo de respuesta en tiempo real
+            </div>
+            <div class="map-card__live">
+              <div class="status-pill-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1s infinite;"></div>
+              SIMULACIÓN EN VIVO
+            </div>
+          </div>
+          <div id="response-map"></div>
+          <div class="map-card__footer">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Mapa de simulación — No refleja posiciones reales de unidades policiales
+          </div>
+        </div>
+
+        <!-- Reset -->
+        <div class="reset-btn-wrapper">
+          <button class="reset-btn" id="resetBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.49"/></svg>
+            Cancelar simulación y reiniciar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════
+       FEATURE CARDS
+  ═══════════════════════════ -->
+  <section class="features-section">
+    <div class="features-section__inner">
+      <h2 class="features-section__title">¿Cómo funciona el sistema?</h2>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-card__icon feature-card__icon--red">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="feature-card__title">Activación inmediata</div>
+          <div class="feature-card__desc">Un solo toque activa el protocolo de emergencia y notifica automáticamente al centro de despacho.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon feature-card__icon--blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="feature-card__title">GPS Preciso</div>
+          <div class="feature-card__desc">Tu ubicación exacta es capturada y transmitida en tiempo real para una respuesta más rápida y efectiva.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon feature-card__icon--orange">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="feature-card__title">Respuesta rápida</div>
+          <div class="feature-card__desc">El sistema asigna la unidad disponible más cercana y calcula la ruta óptima de llegada.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card__icon feature-card__icon--green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="feature-card__title">Datos cifrados</div>
+          <div class="feature-card__desc">Toda la información se transmite por canales seguros con encriptación HTTPS/TLS de extremo a extremo.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════
+       LEGAL SECTION
+  ═══════════════════════════ -->
+  <section class="legal-section">
+    <div class="legal-card">
+      <div class="legal-card__header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="legal-card__title">Aviso Legal – Prototipo Académico</div>
+      </div>
+      <div class="legal-card__body">
+        Este <strong>Botón de Pánico</strong> es una <strong>demostración visual y conceptual</strong> desarrollada como parte de un proyecto académico de la Facultad de Ingeniería de la Universidad de Cundinamarca.<br/><br/>
+        <strong>No está conectado</strong> a ningún servicio de emergencia real, Policía Nacional, Línea 123 ni ninguna autoridad oficial. <strong>Ningún dato es transmitido</strong> a sistemas externos. La geolocalización mostrada es únicamente para fines ilustrativos de la simulación.<br/><br/>
+        En caso de una emergencia real, comunícate inmediatamente con el <strong>123 (Línea de Emergencias)</strong> o acércate a la estación de Policía más cercana.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════
+       FOOTER
+  ═══════════════════════════ -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="navbar__logo-icon" style="width:32px;height:32px;border-radius:9px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        Chía Segura
+      </div>
+      <div class="footer__center">
+        Facultad de Ingeniería – Universidad de Cundinamarca
+      </div>
+      <div class="footer__copy">
+        © 2025 Todos los derechos reservados
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════
+       LOADING OVERLAY
+  ═══════════════════════════ -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">
+      <span>Localizando posición GPS</span>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="loading-progress">
+      <div class="loading-progress__bar" id="loadingBar"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════
+       TOAST CONTAINER
+  ═══════════════════════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+  /*
+   * ════════════════════════════════════════════════════════
+   *  BOTÓN DE PÁNICO – Chía Segura
+   *  Prototipo académico / demo frontend puro
+   *  Universidad de Cundinamarca – Facultad de Ingeniería
+   * ════════════════════════════════════════════════════════
+   */
+  (function () {
+    'use strict';
+
+    /* ──────────────────────────────────────
+       CONSTANTES
+    ────────────────────────────────────── */
+    const CHIA_CENTER = [4.8647, -74.0367];
+    const CHIA_ZOOM   = 15;
+
+    // Posiciones simuladas de unidades de policía en Chía
+    const SIMULATED_UNITS = [
+      { id: 'U-01', name: 'Patrulla Centro',    lat: 4.8710, lng: -74.0320 },
+      { id: 'U-02', name: 'Patrulla Norte',     lat: 4.8580, lng: -74.0410 },
+      { id: 'U-03', name: 'Moto de apoyo',      lat: 4.8690, lng: -74.0450 },
+    ];
+
+    /* ──────────────────────────────────────
+       ESTADO
+    ────────────────────────────────────── */
+    let triggered    = false;
+    let responseMap  = null;
+    let userMarker   = null;
+    let unitMarkers  = [];
+    let etaInterval  = null;
+    let etaSeconds   = 7 * 60; // 7 minutos
+    let movInterval  = null;
+    let userLat      = null;
+    let userLng      = null;
+
+    /* ──────────────────────────────────────
+       ELEMENTOS DEL DOM
+    ────────────────────────────────────── */
+    const panicBtn       = document.getElementById('panicBtn');
+    const alertPanel     = document.getElementById('alertPanel');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingBar     = document.getElementById('loadingBar');
+    const loadingText    = document.getElementById('loadingText').querySelector('span');
+    const etaDisplay     = document.getElementById('etaDisplay');
+    const alertCode      = document.getElementById('alertCode');
+    const resetBtn       = document.getElementById('resetBtn');
+    const navToggle      = document.getElementById('navToggle');
+    const navMenu        = document.getElementById('navMenu');
+
+    /* ──────────────────────────────────────
+       NAVBAR
+    ────────────────────────────────────── */
+    window.addEventListener('scroll', function () {
+      document.getElementById('navbar').classList.toggle('navbar--scrolled', window.scrollY > 50);
+    });
+    if (navToggle && navMenu) {
+      navToggle.addEventListener('click', function () {
+        navMenu.classList.toggle('open');
+      });
+    }
+
+    /* ──────────────────────────────────────
+       TOAST SYSTEM
+    ────────────────────────────────────── */
+    /**
+     * Muestra una notificación toast.
+     * @param {string} title   - Título del toast
+     * @param {string} msg     - Mensaje secundario
+     * @param {string} type    - 'success' | 'error' | 'info' | 'warning'
+     * @param {string} icon    - Emoji / ícono
+     * @param {number} dur     - Duración en ms (default 4000)
+     */
+    function showToast(title, msg, type, icon, dur) {
+      dur = dur || 4000;
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast toast--${type || 'info'}`;
+      el.innerHTML = `
+        <div class="toast__icon">${icon || 'ℹ️'}</div>
+        <div class="toast__body">
+          <div class="toast__title">${title}</div>
+          ${msg ? `<div class="toast__msg">${msg}</div>` : ''}
+        </div>`;
+      container.appendChild(el);
+
+      // Forzar reflow antes de animar
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { el.classList.add('visible'); });
+      });
+
+      setTimeout(function () {
+        el.classList.add('hiding');
+        setTimeout(function () { el.remove(); }, 450);
+      }, dur);
+    }
+
+    /* ──────────────────────────────────────
+       LOADING OVERLAY
+    ────────────────────────────────────── */
+    const LOADING_STEPS = [
+      { text: 'Localizando posición GPS', pct: 20 },
+      { text: 'Conectando con central de despacho', pct: 45 },
+      { text: 'Asignando unidad más cercana', pct: 68 },
+      { text: 'Transmitiendo coordenadas seguras', pct: 85 },
+      { text: 'Alerta confirmada', pct: 100 },
+    ];
+
+    function runLoading(callback) {
+      loadingOverlay.classList.add('active');
+      let step = 0;
+
+      function nextStep() {
+        if (step >= LOADING_STEPS.length) {
+          setTimeout(function () {
+            loadingOverlay.classList.remove('active');
+            loadingBar.style.width = '0%';
+            if (callback) callback();
+          }, 350);
+          return;
+        }
+        const s = LOADING_STEPS[step];
+        loadingText.textContent = s.text;
+        loadingBar.style.width = s.pct + '%';
+        step++;
+        setTimeout(nextStep, 700 + Math.random() * 300);
+      }
+
+      loadingBar.style.width = '0%';
+      setTimeout(nextStep, 200);
+    }
+
+    /* ──────────────────────────────────────
+       GEOLOCALIZACIÓN (real con fallback)
+    ────────────────────────────────────── */
+    function getUserLocation(callback) {
+      if (!navigator.geolocation) {
+        // Fallback: posición aleatoria dentro de Chía
+        const randomLat = CHIA_CENTER[0] + (Math.random() - 0.5) * 0.02;
+        const randomLng = CHIA_CENTER[1] + (Math.random() - 0.5) * 0.02;
+        callback(randomLat, randomLng, false);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        function (pos) { callback(pos.coords.latitude, pos.coords.longitude, true); },
+        function ()    {
+          // Permiso denegado o error: usar posición simulada
+          const randomLat = CHIA_CENTER[0] + (Math.random() - 0.5) * 0.015;
+          const randomLng = CHIA_CENTER[1] + (Math.random() - 0.5) * 0.015;
+          callback(randomLat, randomLng, false);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    }
+
+    /* ──────────────────────────────────────
+       GENERAR CÓDIGO DE ALERTA
+    ────────────────────────────────────── */
+    function generateAlertCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'CS-';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+
+    /* ──────────────────────────────────────
+       MAPA DE RESPUESTA (Leaflet)
+    ────────────────────────────────────── */
+    function initResponseMap(lat, lng) {
+      if (responseMap) { responseMap.remove(); responseMap = null; }
+      userMarker   = null;
+      unitMarkers  = [];
+
+      responseMap = L.map('response-map', { zoomControl: true }).setView([lat, lng], CHIA_ZOOM);
+
+      // Tiles oscuros (CartoDB Dark Matter)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap © CARTO', maxZoom: 19
+      }).addTo(responseMap);
+
+      // ── Marcador de usuario (víctima) ──
+      const userIconHtml = `
+        <div style="
+          width:22px;height:22px;border-radius:50%;
+          background:radial-gradient(circle at 40% 35%, #fca5a5, #ef4444);
+          border:3px solid #fff;
+          box-shadow:0 0 0 4px rgba(239,68,68,0.35), 0 4px 16px rgba(239,68,68,0.6);
+          animation:user-pulse 1.2s ease-in-out infinite;
+        "></div>
+        <style>@keyframes user-pulse{0%,100%{box-shadow:0 0 0 4px rgba(239,68,68,0.35),0 4px 16px rgba(239,68,68,0.6)}50%{box-shadow:0 0 0 9px rgba(239,68,68,0.15),0 4px 24px rgba(239,68,68,0.8)}}</style>`;
+      const userIcon = L.divIcon({
+        className: '',
+        html: userIconHtml,
+        iconSize: [22, 22], iconAnchor: [11, 11]
+      });
+      userMarker = L.marker([lat, lng], { icon: userIcon })
+        .addTo(responseMap)
+        .bindPopup(`
+          <div style="font-family:var(--font);">
+            <strong style="color:#fca5a5;">📍 Tu ubicación</strong><br/>
+            <span style="font-size:11px;color:#94a3b8;">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
+          </div>`);
+
+      // Círculo de zona de alerta
+      L.circle([lat, lng], {
+        radius: 150,
+        color: '#ef4444',
+        fillColor: '#ef4444',
+        fillOpacity: 0.06,
+        weight: 1.5,
+        dashArray: '6 5'
+      }).addTo(responseMap);
+
+      // ── Marcadores de unidades simuladas ──
+      SIMULATED_UNITS.forEach(function (unit) {
+        // Posición aleatoria cerca del usuario (simulación)
+        const offLat = (Math.random() - 0.5) * 0.025 + lat;
+        const offLng = (Math.random() - 0.5) * 0.025 + lng;
+
+        const unitIconHtml = `
+          <div style="
+            width:34px;height:34px;border-radius:10px;
+            background:linear-gradient(135deg,#1d4ed8,#2563eb);
+            border:2px solid rgba(255,255,255,0.25);
+            box-shadow:0 4px 16px rgba(37,99,235,0.55);
+            display:flex;align-items:center;justify-content:center;
+          ">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>`;
+        const unitIcon = L.divIcon({
+          className: '',
+          html: unitIconHtml,
+          iconSize: [34, 34], iconAnchor: [17, 17]
+        });
+        const m = L.marker([offLat, offLng], { icon: unitIcon })
+          .addTo(responseMap)
+          .bindPopup(`
+            <div style="font-family:var(--font);">
+              <strong style="color:#60a5fa;">🚔 ${unit.name}</strong><br/>
+              <span style="font-size:11px;color:#94a3b8;">ID: ${unit.id} · En desplazamiento</span>
+            </div>`);
+
+        // Dibujar línea de ruta simulada
+        L.polyline([[offLat, offLng], [lat, lng]], {
+          color: '#2563eb',
+          weight: 2,
+          opacity: 0.45,
+          dashArray: '8 6'
+        }).addTo(responseMap);
+
+        unitMarkers.push({ marker: m, lat: offLat, lng: offLng, targetLat: lat, targetLng: lng });
+      });
+
+      // Invalidar tamaño (por si está oculto)
+      setTimeout(function () { responseMap.invalidateSize(); }, 80);
+
+      // ── Animación de movimiento de unidades ──
+      animateUnits();
+    }
+
+    /* ──────────────────────────────────────
+       ANIMACIÓN DE UNIDADES (lerp hacia usuario)
+    ────────────────────────────────────── */
+    function animateUnits() {
+      if (movInterval) clearInterval(movInterval);
+
+      movInterval = setInterval(function () {
+        unitMarkers.forEach(function (u) {
+          const dlat = u.targetLat - u.lat;
+          const dlng = u.targetLng - u.lng;
+          const dist  = Math.sqrt(dlat * dlat + dlng * dlng);
+
+          if (dist < 0.0002) return; // Llegó
+
+          // Avanzar un 2% de la distancia restante por tick
+          const step = 0.02;
+          u.lat += dlat * step;
+          u.lng += dlng * step;
+          u.marker.setLatLng([u.lat, u.lng]);
+        });
+      }, 1200);
+    }
+
+    /* ──────────────────────────────────────
+       CUENTA REGRESIVA ETA
+    ────────────────────────────────────── */
+    function startEtaCountdown() {
+      if (etaInterval) clearInterval(etaInterval);
+
+      etaInterval = setInterval(function () {
+        if (etaSeconds <= 0) {
+          clearInterval(etaInterval);
+          etaDisplay.textContent = '¡Llegó!';
+          etaDisplay.style.color = 'var(--green)';
+          showToast('🚔 Unidad llegó', 'La unidad de respuesta ha llegado a tu ubicación.', 'success', '✅', 6000);
+          return;
+        }
+        etaSeconds--;
+        const m = Math.floor(etaSeconds / 60);
+        const s = etaSeconds % 60;
+        etaDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    /* ──────────────────────────────────────
+       ACTIVAR BOTÓN DE PÁNICO
+    ────────────────────────────────────── */
+    function activatePanic() {
+      if (triggered) return;
+      triggered = true;
+
+      panicBtn.classList.add('triggered');
+      panicBtn.disabled = true;
+
+      // Toasts de inicio
+      showToast('🚨 Alerta activada', 'Obteniendo tu ubicación GPS…', 'error', '🚨', 3000);
+
+      // Iniciar loading
+      runLoading(function () {
+
+        // Obtener ubicación (real o simulada)
+        getUserLocation(function (lat, lng, isReal) {
+          userLat = lat;
+          userLng = lng;
+
+          // Generar código de alerta
+          alertCode.textContent = generateAlertCode();
+
+          // ETA aleatoria entre 4-8 minutos
+          etaSeconds = (4 + Math.floor(Math.random() * 5)) * 60;
+
+          // Mostrar panel
+          alertPanel.classList.add('active');
+
+          // Scroll suave al panel
+          setTimeout(function () {
+            alertPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 200);
+
+          // Iniciar mapa
+          setTimeout(function () {
+            initResponseMap(lat, lng);
+            startEtaCountdown();
+          }, 300);
+
+          // Toasts informativos
+          setTimeout(function () {
+            showToast(
+              isReal ? '📍 Ubicación GPS confirmada' : '📍 Ubicación simulada usada',
+              isReal
+                ? `Coordenadas: ${lat.toFixed(5)}, ${lng.toFixed(5)}`
+                : 'Se usó ubicación de demostración en Chía.',
+              isReal ? 'success' : 'warning',
+              isReal ? '✅' : '⚠️',
+              5000
+            );
+          }, 500);
+
+          setTimeout(function () {
+            showToast('🚔 La Policía ha sido notificada', 'Unidad cercana en camino a tu posición.', 'info', '🚔', 5000);
+          }, 1800);
+
+          setTimeout(function () {
+            showToast('📡 Alerta transmitida', 'Tu código de alerta fue registrado en el sistema.', 'success', '📡', 4500);
+          }, 3200);
+        });
+      });
+    }
+
+    /* ──────────────────────────────────────
+       RESET
+    ────────────────────────────────────── */
+    function resetPanic() {
+      triggered = false;
+
+      // Limpiar timers
+      if (etaInterval) { clearInterval(etaInterval); etaInterval = null; }
+      if (movInterval)  { clearInterval(movInterval);  movInterval  = null; }
+
+      // Resetear etaSeconds
+      etaSeconds = 7 * 60;
+      if (etaDisplay) {
+        etaDisplay.textContent = '7:00';
+        etaDisplay.style.color = 'var(--orange)';
+      }
+
+      // Destruir mapa
+      if (responseMap) { responseMap.remove(); responseMap = null; }
+      userMarker  = null;
+      unitMarkers = [];
+
+      // UI
+      panicBtn.classList.remove('triggered');
+      panicBtn.disabled = false;
+      alertPanel.classList.remove('active');
+      alertCode.textContent = '–';
+
+      // Scroll arriba
+      document.querySelector('.panic-btn-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      showToast('Simulación cancelada', 'Puedes presionar el botón de nuevo para reiniciar.', 'info', '🔄', 3500);
+    }
+
+    /* ──────────────────────────────────────
+       EVENTOS
+    ────────────────────────────────────── */
+    if (panicBtn) panicBtn.addEventListener('click', activatePanic);
+    if (resetBtn) resetBtn.addEventListener('click', resetPanic);
+
+  })();
+  </script>
+
+</body>
+</html>

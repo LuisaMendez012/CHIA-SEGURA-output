@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nosotros – Chía Segura</title>
+  <meta name="description" content="Conoce al equipo detrás de Chía Segura, nuestra misión y visión para transformar la seguridad del municipio de Chía, Cundinamarca." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <style>
+    /* ── Page hero (no full-screen) ── */
+    .page-hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      padding: 120px 24px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    .page-hero__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero__title span { color: var(--orange); }
+    .page-hero__sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.75);
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── About blocks ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-top: 48px;
+    }
+    .about-block {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+    }
+    .about-block:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .about-block__icon {
+      width: 56px; height: 56px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .about-block__icon--orange { background: var(--orange-light); }
+    .about-block__icon--blue   { background: var(--blue-light); }
+    .about-block__title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+    }
+    .about-block__body {
+      font-size: .95rem;
+      color: var(--gray-600);
+      line-height: 1.75;
+    }
+
+    /* ── Team section ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 28px;
+      margin-top: 48px;
+    }
+    .team-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .team-card__avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(37,99,235,.3);
+    }
+    .team-card__name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    .team-card__role {
+      font-size: .82rem;
+      color: var(--orange);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .team-card__desc {
+      font-size: .82rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+
+    /* ── Values ── */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .value-card {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .value-card:hover { transform: translateY(-3px); }
+    .value-card__emoji { font-size: 2.4rem; margin-bottom: 12px; display: block; }
+    .value-card__title { font-size: 1.05rem; font-weight: 800; color: var(--white); margin-bottom: 8px; }
+    .value-card__desc  { font-size: .85rem; color: rgba(255,255,255,.65); line-height: 1.6; }
+
+    @media (max-width: 900px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .values-grid { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu">
+        <li><a class="navbar__link" href="index.html">Inicio</a></li>
+        <li><a class="navbar__link" href="about.html">Nosotros</a></li>
+        <li><a class="navbar__link" href="services.html">Servicios</a></li>
+        <li><a class="navbar__link" href="heatmap.html">Mapa de Calor</a></li>
+        <li><a class="navbar__link" href="contact.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <section class="page-hero">
+    <h1 class="page-hero__title">Acerca de <span>Chía Segura</span></h1>
+    <p class="page-hero__sub">Somos un equipo de estudiantes de Ingeniería comprometidos con la seguridad y el bienestar de nuestra comunidad.</p>
+  </section>
+
+  <!-- ═══ MISIÓN & VISIÓN ═══ -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section__title">Nuestra Razón de Ser</h2>
+      <p class="section__subtitle">Tecnología al servicio de la comunidad</p>
+      <div class="about-grid">
+        <div class="about-block">
+          <div class="about-block__icon about-block__icon--orange">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4l3 3"/>
+            </svg>
+          </div>
+          <h3 class="about-block__title">Nuestra Misión</h3>
+          <p class="about-block__body">
+            Empoderar a los ciudadanos de Chía con una herramienta tecnológica que les permita reportar
+            incidentes de seguridad en tiempo real, contribuyendo activamente a la reducción de la
+            criminalidad y fortaleciendo la colaboración entre la comunidad y las autoridades locales.
+          </p>
+        </div>
+
+        <div class="about-block">
+          <div class="about-block__icon about-block__icon--blue">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <h3 class="about-block__title">Nuestra Visión</h3>
+          <p class="about-block__body">
+            Convertirnos en la plataforma de referencia para la seguridad ciudadana en Colombia,
+            expandiendo el modelo a otros municipios del país y demostrando que la tecnología
+            y la participación ciudadana son la clave para comunidades más seguras y resilientes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ VALORES ═══ -->
+  <section class="section section--light">
+    <div class="container">
+      <h2 class="section__title">Nuestros Valores</h2>
+      <p class="section__subtitle">Los principios que guían cada decisión</p>
+      <div class="values-grid">
+        <div class="value-card">
+          <span class="value-card__emoji">🤝</span>
+          <div class="value-card__title">Comunidad</div>
+          <div class="value-card__desc">Construimos para y con los ciudadanos. Su bienestar es nuestra prioridad.</div>
+        </div>
+        <div class="value-card">
+          <span class="value-card__emoji">🔒</span>
+          <div class="value-card__title">Privacidad</div>
+          <div class="value-card__desc">Protegemos los datos de cada ciudadano con los más altos estándares de seguridad.</div>
+        </div>
+        <div class="value-card">
+          <span class="value-card__emoji">⚡</span>
+          <div class="value-card__title">Agilidad</div>
+          <div class="value-card__desc">Cada segundo cuenta. Nuestra plataforma opera en tiempo real para maximizar el impacto.</div>
+        </div>
+        <div class="value-card">
+          <span class="value-card__emoji">📊</span>
+          <div class="value-card__title">Transparencia</div>
+          <div class="value-card__desc">Los datos son públicos y accesibles para que las autoridades y ciudadanos tomen mejores decisiones.</div>
+        </div>
+        <div class="value-card">
+          <span class="value-card__emoji">🌱</span>
+          <div class="value-card__title">Innovación</div>
+          <div class="value-card__desc">Exploramos constantemente nuevas tecnologías para mejorar la experiencia y el impacto.</div>
+        </div>
+        <div class="value-card">
+          <span class="value-card__emoji">🎓</span>
+          <div class="value-card__title">Academia</div>
+          <div class="value-card__desc">Nacemos en la universidad y aplicamos el rigor académico a problemas reales de la sociedad.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ EQUIPO ═══ -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section__title">Nuestro Equipo</h2>
+      <p class="section__subtitle">Estudiantes de la Facultad de Ingeniería – Universidad de Cundinamarca</p>
+      <div class="team-grid">
+
+        <div class="team-card">
+          <div class="team-card__avatar">A</div>
+          <div class="team-card__name">Integrante 1</div>
+          <div class="team-card__role">Líder de Proyecto</div>
+          <div class="team-card__desc">Coordinación general, arquitectura de software y estrategia de producto.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-card__avatar">B</div>
+          <div class="team-card__name">Integrante 2</div>
+          <div class="team-card__role">Desarrollo Frontend</div>
+          <div class="team-card__desc">Diseño de interfaces, experiencia de usuario y accesibilidad web.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-card__avatar">C</div>
+          <div class="team-card__name">Integrante 3</div>
+          <div class="team-card__role">Desarrollo Backend</div>
+          <div class="team-card__desc">Integración con Firebase, APIs y gestión de bases de datos en tiempo real.</div>
+        </div>
+
+        <div class="team-card">
+          <div class="team-card__avatar">D</div>
+          <div class="team-card__name">Integrante 4</div>
+          <div class="team-card__role">Análisis de Datos</div>
+          <div class="team-card__desc">Mapas de calor, estadísticas delictivas y modelos de visualización.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span>Chía Segura</span>
+      </div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2025 Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/toast.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/animations.js"></script>
+</body>
+</html>

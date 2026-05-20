@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solución – Chía Segura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+      <ul class="navbar__menu" id="navMenu">
+        <li><a class="navbar__link" href="index.html">Inicio</a></li>
+        <li><a class="navbar__link" href="mapa.html">Mapa</a></li>
+        <li><a class="navbar__link" href="panico.html">Pánico</a></li>
+        <li><a class="navbar__link" href="contacto.html">Contacto</a></li>
+      </ul>
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main style="padding:120px 24px 60px;">
+    <div class="container">
+      <h1 class="solution-layout__title">Nuestra Solución</h1>
+      <p class="solution-layout__body">Chía Segura es una plataforma digital que permite reportar delitos en tiempo real con geolocalización, facilitando a las autoridades actuar de manera rápida y eficiente mediante análisis de datos.</p>
+
+      <ul class="solution-list">
+        <li class="solution-list__item">Reportes en tiempo real</li>
+        <li class="solution-list__item">Geolocalización precisa</li>
+        <li class="solution-list__item">Apoyo a la policía con datos inteligentes</li>
+      </ul>
+
+      <section style="margin-top:24px;">
+        <h2>Cómo funciona el sistema</h2>
+        <p>Explicación del flujo del reporte: usuario → geolocalización → almacenamiento → visualización en mapas y envío a autoridades.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">Chía Segura</div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2025 Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <script src="config/firebase.js"></script>
+  <script src="config/emailjs.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/animations.js"></script>
+</body>
+</html>
