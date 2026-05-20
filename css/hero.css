@@ -9,11 +9,23 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  background: #0b1f39;
+}
 
-  /* Imagen de fondo: ciudad nocturna. Fallback a gradiente oscuro */
-  background:
-    url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg')
-    center/cover no-repeat;
+.hero-home,
+.hero-mapa {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.hero-home {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg');
+}
+
+.hero-mapa {
+  /* Imagen separada para el mapa, puede cambiarse sin afectar el hero principal */
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg');
 }
 
 /* ─── OVERLAY ────────────────────────────────── */

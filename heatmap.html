@@ -142,10 +142,10 @@
 <body>
 
   <!-- ═══ NAVBAR ═══ -->
-  <nav class="navbar scrolled" id="navbar">
+  <nav class="navbar scrolled" id="navbar" role="navigation" aria-label="Main navigation">
     <div class="navbar__container">
       <a class="navbar__brand" href="index.html">
-        <div class="navbar__logo-icon">
+        <div class="navbar__logo-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
@@ -153,15 +153,15 @@
         <span class="navbar__brand-text">Chía Segura</span>
       </a>
 
-      <ul class="navbar__menu" id="navMenu">
-        <li><a class="navbar__link" href="index.html">Inicio</a></li>
-        <li><a class="navbar__link" href="about.html">Nosotros</a></li>
-        <li><a class="navbar__link" href="services.html">Servicios</a></li>
-        <li><a class="navbar__link" href="heatmap.html">Mapa de Calor</a></li>
-        <li><a class="navbar__link" href="contact.html">Contacto</a></li>
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="about.html">Nosotros</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="services.html">Servicios</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="heatmap.html">Mapa de Calor</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contact.html">Contacto</a></li>
       </ul>
 
-      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span></span><span></span><span></span>
       </button>
     </div>

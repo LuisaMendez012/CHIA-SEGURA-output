@@ -165,10 +165,10 @@
 <body>
 
   <!-- ═══ NAVBAR ═══ -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
     <div class="navbar__container">
       <a class="navbar__brand" href="index.html">
-        <div class="navbar__logo-icon">
+        <div class="navbar__logo-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
@@ -176,21 +176,21 @@
         <span class="navbar__brand-text">Chía Segura</span>
       </a>
 
-      <ul class="navbar__menu" id="navMenu">
-        <li><a class="navbar__link" href="#inicio">Inicio</a></li>
-        <li><a class="navbar__link" href="mapa.html">Mapa</a></li>
-        <li><a class="navbar__link" href="panico.html">Pánico</a></li>
-        <li><a class="navbar__link" href="contacto.html">Contacto</a></li>
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="#inicio">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="boton-panico.html">Pánico</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
       </ul>
 
-      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
 
   <!-- ═══ HERO ═══ -->
-  <section class="hero" id="inicio">
+  <section class="hero hero-home" id="inicio">
     <div class="hero__overlay"></div>
     <div class="hero__content">
       <h1 class="hero__title">
@@ -312,7 +312,7 @@
         <span>Chía Segura</span>
       </div>
       <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
-      <div class="footer__copy">© 2025 Todos los derechos reservados</div>
+      <div class="footer__copy">© 2026 Todos los derechos reservados</div>
     </div>
   </footer>
 

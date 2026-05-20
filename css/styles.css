@@ -81,6 +81,82 @@ input, select, textarea { font-family: inherit; }
   background: var(--gray-50);
 }
 
+.section--blue {
+  background:
+    linear-gradient(rgba(8,26,51,0.75), rgba(17,47,93,0.85)),
+    url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg') center/cover fixed no-repeat;
+  color: #f8fafc;
+  position: relative;
+}
+
+.section--blue::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06) 0%, transparent 25%),
+              radial-gradient(circle at 85% 15%, rgba(255,255,255,0.05) 0%, transparent 22%);
+  pointer-events: none;
+}
+
+.section--blue > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.section--blue .section__title,
+.section--blue .section__subtitle,
+.section--blue .heatmap-filter-label,
+.section--blue .heatmap-stat-badge,
+.section--blue .incidents-panel__title {
+  color: #f8fafc;
+}
+
+.page--blue {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(rgba(8,26,51,0.80), rgba(17,47,93,0.90)),
+              url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg') center/cover fixed no-repeat;
+  color: #f8fafc;
+  position: relative;
+}
+
+.page--blue::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 18% 20%, rgba(255,255,255,0.06) 0%, transparent 26%),
+              radial-gradient(circle at 82% 12%, rgba(255,255,255,0.05) 0%, transparent 22%);
+  pointer-events: none;
+}
+
+.page--blue main,
+.page--blue .hero,
+.page--blue .container,
+.page--blue .footer {
+  position: relative;
+  z-index: 1;
+}
+
+.page--blue main {
+  flex: 1;
+}
+
+.page--blue footer {
+  margin-top: auto;
+}
+
+.page--blue h1,
+.page--blue p,
+.page--blue a,
+.page--blue .btn {
+  color: #f8fafc;
+}
+
+.page--blue a.btn {
+  background: #f97316;
+}
+
 .section__title {
   font-size: 2rem;
   font-weight: 800;

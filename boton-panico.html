@@ -12,6 +12,7 @@
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
 
   <style>
     /* ══════════════════════════════════════
@@ -72,123 +73,7 @@
       z-index: 0;
     }
 
-    /* ══════════════════════════════════════
-       NAVBAR
-    ══════════════════════════════════════ */
-    .navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      background: rgba(15,23,42,0.80);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--blue-border);
-      transition: var(--transition);
-    }
-    .navbar--scrolled {
-      background: rgba(15,23,42,0.97);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    }
-    .navbar__container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .navbar__brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--white);
-      letter-spacing: -0.2px;
-    }
-    .navbar__logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px var(--orange-glow);
-      flex-shrink: 0;
-    }
-    .navbar__menu {
-      display: flex;
-      gap: 6px;
-      list-style: none;
-      align-items: center;
-    }
-    .navbar__link {
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 8px;
-      transition: var(--transition);
-    }
-    .navbar__link:hover,
-    .navbar__link.active {
-      color: var(--white);
-      background: rgba(255,255,255,0.08);
-    }
-    .navbar__badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #fca5a5;
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.3px;
-    }
-    .navbar__badge-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--red);
-      animation: blink 1.2s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-    .navbar__toggle {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-    }
-    .navbar__toggle span {
-      display: block;
-      width: 22px; height: 2px;
-      background: var(--white);
-      border-radius: 2px;
-      transition: var(--transition);
-    }
-
-    @media (max-width: 768px) {
-      .navbar__menu {
-        display: none;
-        position: absolute;
-        top: 64px; left: 0; right: 0;
-        flex-direction: column;
-        background: rgba(15,23,42,0.98);
-        backdrop-filter: blur(14px);
-        padding: 16px;
-        gap: 4px;
-        border-bottom: 1px solid var(--blue-border);
-      }
-      .navbar__menu.open { display: flex; }
-      .navbar__toggle { display: flex; }
-    }
+    /* Navbar styles moved to css/navbar.css for consistency across pages */
 
     /* ══════════════════════════════════════
        HERO
@@ -902,27 +787,27 @@
     .hidden { display: none !important; }
   </style>
 </head>
-<body>
+<body class="page--blue">
 
   <!-- ═══════════════════════
        NAVBAR
   ═══════════════════════════ -->
-  <nav class="navbar" id="navbar">
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
     <div class="navbar__container">
       <a class="navbar__brand" href="index.html">
-        <div class="navbar__logo-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <span>Chía Segura</span>
+        <span class="navbar__brand-text">Chía Segura</span>
       </a>
 
-      <ul class="navbar__menu" id="navMenu">
-        <li><a class="navbar__link" href="index.html#inicio">Inicio</a></li>
-        <li><a class="navbar__link" href="index.html#mapa">Mapa de Calor</a></li>
-        <li><a class="navbar__link active" href="#">Botón de Pánico</a></li>
-        <li>
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+        <li role="none">
           <span class="navbar__badge">
             <span class="navbar__badge-dot"></span>
             DEMO
@@ -930,11 +815,14 @@
         </li>
       </ul>
 
-      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú">
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
+
+
+
 
   <!-- ═══════════════════════
        HERO
@@ -956,14 +844,16 @@
   <!-- ═══════════════════════
        LEGAL WARNING (top)
   ═══════════════════════════ -->
-  <div style="position:relative;z-index:1;padding:0 24px;">
+  <div style="position:relative;z-index:1;padding:0 24px; margin-bottom: 32px;">
     <div class="legal-banner container">
       <div class="legal-banner__icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </div>
       <span>
         <strong>Prototipo académico de visualización.</strong> No conectado a servicios oficiales de emergencia. Para emergencias reales llama al <strong>123</strong>.
+      
       </span>
+
     </div>
   </div>
 
@@ -1170,7 +1060,7 @@
         Facultad de Ingeniería – Universidad de Cundinamarca
       </div>
       <div class="footer__copy">
-        © 2025 Todos los derechos reservados
+        © 2026 Todos los derechos reservados
       </div>
     </div>
   </footer>
@@ -1250,17 +1140,7 @@
     const navToggle      = document.getElementById('navToggle');
     const navMenu        = document.getElementById('navMenu');
 
-    /* ──────────────────────────────────────
-       NAVBAR
-    ────────────────────────────────────── */
-    window.addEventListener('scroll', function () {
-      document.getElementById('navbar').classList.toggle('navbar--scrolled', window.scrollY > 50);
-    });
-    if (navToggle && navMenu) {
-      navToggle.addEventListener('click', function () {
-        navMenu.classList.toggle('open');
-      });
-    }
+    /* NAVBAR handled by js/navbar.js (scroll, active link, mobile toggle) */
 
     /* ──────────────────────────────────────
        TOAST SYSTEM
