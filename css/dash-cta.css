@@ -1,0 +1,52 @@
+/* Minimal, premium CTA for the "EL PROBLEMA" dashboard right panel */
+
+.dash-cta {
+  grid-column: span 2;
+  margin-top: 6px;
+  text-align: center;
+  padding: 22px 18px;
+  border-radius: 18px;
+  border: 1.5px solid rgba(229,231,235,.95);
+  background: rgba(255,255,255,.92);
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-cta__kicker {
+  font-weight: 950;
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+
+.dash-cta__kicker + .dash-cta__text {
+  margin-top: 10px;
+}
+
+
+.dash-cta__text {
+  color: var(--gray-600);
+  font-weight: 750;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  margin: 0 auto 16px;
+  max-width: 520px;
+}
+
+.dash-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dash-cta__btn:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .dash-cta {
+    padding: 18px 14px;
+  }
+}
+

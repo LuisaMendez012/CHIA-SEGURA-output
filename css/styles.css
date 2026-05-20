@@ -213,6 +213,20 @@ input, select, textarea { font-family: inherit; }
   width: 100%;
 }
 
+/* ─── OUTLINE BUTTON (para acciones secundarias visibles sobre fondos oscuros) ─── */
+.btn--outline {
+  background: var(--blue);
+  color: var(--white);
+  border: 1.5px solid rgba(37,99,235,0.9);
+  box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+}
+.btn--outline:hover {
+  background: #1e40af; /* azul más oscuro en hover */
+  border-color: #1e40af;
+  transform: translateY(-2px);
+}
+.btn--outline:active { transform: translateY(0); }
+
 /* ─── FORM INPUTS ────────────────────────────── */
 .form-input {
   width: 100%;

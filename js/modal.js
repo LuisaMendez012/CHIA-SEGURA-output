@@ -26,6 +26,8 @@
   let selectedLat  = null;
   let selectedLng  = null;
   let minimapOpen  = false;
+  let isSubmitting = false;
+
 
   /* ── Elements ─────────────────────────────── */
   const backdrop    = document.getElementById('modalBackdrop');
@@ -266,7 +268,15 @@
   /* ── Submit ───────────────────────────────── */
   if (submitBtn) {
     submitBtn.addEventListener('click', async function() {
-      if (!validateForm()) return;
+      if (isSubmitting) return;
+
+      if (!validateForm()) {
+        console.log('Formulario inválido');
+        return;
+      }
+
+      console.log('Enviando reporte');
+      isSubmitting = true;
 
       const reportData = {
         id:      Date.now(),
@@ -283,41 +293,139 @@
       };
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Enviando…';
+      const originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.innerHTML = `
+        <span class="btn-spinner" aria-hidden="true" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;margin-right:8px;animation:bbspin 0.75s linear infinite;"></span>
+        <span>Enviando…</span>
+      `;
 
-      // Firebase (si disponible)
-      if (window.ChiaSeguraDB) {
-        const r = await window.ChiaSeguraDB.saveReport(reportData);
-        if (!r.success) console.warn('[modal] Firebase:', r.reason);
-      }
+      try {
+        // Firebase (si disponible)
+        if (window.ChiaSeguraDB) {
+          const r = await window.ChiaSeguraDB.saveReport(reportData);
+          if (r && !r.success) console.warn('[modal] Firebase:', r.reason);
+        }
 
-      // EmailJS (si disponible)
-      if (window.ChiaSeguraEmail) {
-        const r = await window.ChiaSeguraEmail.sendReportEmail(reportData);
-        if (!r.success) console.warn('[modal] EmailJS:', r.reason);
+        // EmailJS (si disponible)
+        if (window.ChiaSeguraEmail) {
+          const r = await window.ChiaSeguraEmail.sendReportEmail(reportData);
+          if (r && !r.success) console.warn('[modal] EmailJS:', r.reason);
+        }
+      } catch (err) {
+        console.error('[modal] Error enviando reporte:', err);
+        // no rompemos el flujo: igual guardamos local y mostramos toast
       }
 
       // Guardar localmente
       allIncidents.push(reportData);
       saveIncidents(allIncidents);
 
-      // Reset form
+      // ---- ÉXITO (1) Toast primero para evitar que el close lo oculte ----
+      const toastMsg = 'Reporte enviado correctamente';
+
+      // Fallback visual SEGURO (crea un toast moderno si showToast no crea/visible)
+      function showSuccessToastHard() {
+        try {
+          showToast(toastMsg, 'success');
+        } catch (e) {
+          console.error('[modal] showToast falló:', e);
+        }
+
+        const waitFor = (ms) => new Promise(res => setTimeout(res, ms));
+
+        (async () => {
+          // Esperar a que toast.js cree elementos
+          await waitFor(50);
+
+          const toastContainer = document.getElementById('toastContainer');
+          const existing = toastContainer ? toastContainer.querySelector('.toast') : null;
+
+          // Si toastContainer no existe o no se agregó, creamos uno nuevo fijo.
+          if (!toastContainer || !existing || !existing.textContent.includes(toastMsg)) {
+            // Elimina toasts previos (para evitar que el usuario no vea el nuevo)
+            if (toastContainer) {
+              toastContainer.querySelectorAll('.toast').forEach(t => t.remove());
+            }
+
+            const c = toastContainer || document.createElement('div');
+            if (!toastContainer) {
+              c.id = 'toastContainer';
+              c.style.position = 'fixed';
+              c.style.top = '16px';
+              c.style.right = '16px';
+              c.style.zIndex = '99999';
+              c.style.display = 'flex';
+              c.style.flexDirection = 'column';
+              c.style.gap = '10px';
+              document.body.appendChild(c);
+            }
+
+            const el = document.createElement('div');
+            el.className = 'toast toast--hard-success';
+            el.textContent = toastMsg;
+            el.style.padding = '14px 16px';
+            el.style.borderRadius = '14px';
+            el.style.background = 'rgba(17,24,39,0.95)';
+            el.style.border = '1px solid rgba(74,222,128,0.35)';
+            el.style.color = '#86efac';
+            el.style.fontFamily = 'Nunito, sans-serif';
+            el.style.fontWeight = '900';
+            el.style.backdropFilter = 'blur(10px)';
+            el.style.boxShadow = '0 14px 40px rgba(0,0,0,0.35)';
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-10px) scale(0.98)';
+            el.style.transition = 'opacity .25s ease, transform .25s ease';
+            c.appendChild(el);
+
+            requestAnimationFrame(() => {
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0) scale(1)';
+            });
+
+            setTimeout(() => {
+              el.style.opacity = '0';
+              el.style.transform = 'translateY(-8px) scale(0.98)';
+              setTimeout(() => el.remove(), 260);
+            }, 3000);
+          }
+        })();
+      }
+
+      showSuccessToastHard();
+      console.log('Reporte enviado correctamente');
+
+      // ---- ÉXITO (2) Reset form + validaciones ----
       FIELDS.forEach(f => { const el = document.getElementById(f.id); if (el) el.value = ''; });
       if (miniPin && miniMap) { miniMap.removeLayer(miniPin); miniPin = null; }
       selectedLat = null; selectedLng = null;
       pill.classList.remove('visible');
-
-      closeModal();
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Enviar Reporte';
       clearErrors();
-      showToast('✅ ¡Reporte enviado! Gracias por contribuir a Chía Segura.', 'success');
+
+      // ---- ÉXITO (3) Reactivar botón ----
+      submitBtn.disabled = false;
+      isSubmitting = false;
+      submitBtn.innerHTML = originalBtnHtml;
+
+      // ---- ÉXITO (4) Cerrar modal en 2-3s (y permitir cierre manual) ----
+      // Quitamos el cierre inmediato para asegurar que el toast sea visible.
+      setTimeout(() => {
+        // Si el usuario lo cerró manualmente antes, closeModal no rompe.
+        closeModal();
+      }, 2400);
+
     });
+
   }
 
-  // Shake keyframe
+  // Shake + spinner keyframes + animación suave de éxito
   const s = document.createElement('style');
-  s.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}`;
+  s.textContent = `
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes bbspin{to{transform:rotate(360deg)}}
+@keyframes toastSuccessPop{0%{transform:translateY(8px) scale(.98); opacity:.0} 40%{opacity:1} 100%{transform:translateY(0) scale(1); opacity:1}}
+@keyframes fadeOutFast{to{opacity:0; transform:translateY(6px)}}`;
   document.head.appendChild(s);
+
+
 
 })();

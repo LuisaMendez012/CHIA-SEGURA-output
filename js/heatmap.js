@@ -341,34 +341,202 @@
   }
 
   /* ─────────────────────────────────────────────
-     Datos de demostración (primeros 8 incidentes)
+     Datos de demostración (mock realistas)
   ────────────────────────────────────────────── */
   function seedDemoData() {
-    if (getIncidents().length > 0) return;
-    const demos = [
-      { type: 'hurto',      address: 'Cra 6 # 11-20, Centro Chía',          description: 'Hurto de celular en vía pública' },
-      { type: 'atraco',     address: 'Cll 13 # 5-30, Parque Principal',      description: 'Atraco a mano armada cerca al parque' },
-      { type: 'vandalismo', address: 'Cra 3 # 8-10, Samaria',               description: 'Daño a vehículos parqueados' },
-      { type: 'hurto',      address: 'Portal de Chía, local 12',             description: 'Hurto en centro comercial' },
-      { type: 'accidente',  address: 'Autopista Norte Km 22, Cajicá-Chía',  description: 'Accidente de tránsito con heridos leves' },
-      { type: 'hurto',      address: 'Cll 5 # 9-45, La Balsa',              description: 'Hurto de bicicleta' },
-      { type: 'otro',       address: 'Vía Fonqueta, Chía',                  description: 'Riña entre personas' },
-      { type: 'atraco',     address: 'Sindamanoy, Conjunto Las Acacias',    description: 'Intento de hurto a residencia' },
+    // Si ya hay datos, intenta garantizar una cantidad mínima para que el mapa se vea completo.
+    const existingCount = getIncidents().length;
+    const MIN_COUNT = 120;
+    if (existingCount >= MIN_COUNT) return;
+
+
+    // Objetivo: 200-400 incidentes.
+    const TARGET_COUNT = 180;
+
+
+    // Distribución realista por categoría:
+    // 40% hurto, 20% accidente, 15% vandalismo, 15% atraco, 10% otros.
+    const WEIGHTS = {
+      hurto: 40,
+      accidente: 20,
+      vandalismo: 15,
+      atraco: 15,
+      otro: 10,
+    };
+
+    const zones = [
+      { label: 'Centro Chía', coordsBias: [0.0000, 0.0000], base: 'Centro Chía' },
+      { label: 'La Caro', coordsBias: [-0.0020, -0.0010], base: 'La Caro' },
+      { label: 'Bojacá', coordsBias: [0.0020, -0.0015], base: 'Bojacá' },
+      { label: 'Yerbabuena', coordsBias: [-0.0030, 0.0010], base: 'Yerbabuena' },
+      { label: 'Cerca Universidad de La Sabana', coordsBias: [0.0010, 0.0010], base: 'Cerca Universidad de La Sabana' },
+      { label: 'Río Frío', coordsBias: [-0.0015, 0.0020], base: 'Río Frío' },
+      { label: 'Variante Chía-Cajicá', coordsBias: [0.0028, 0.0018], base: 'Variante Chía-Cajicá' },
+      { label: 'Zona Comercial', coordsBias: [0.0008, -0.0012], base: 'Zona Comercial' },
+      { label: 'Sectores residenciales', coordsBias: [-0.0010, -0.0018], base: 'Sectores residenciales' },
+      { label: 'La Fontana', coordsBias: [0.0017, -0.0020], base: 'La Fontana' },
     ];
-    const months = ['ene','feb','mar','abr','may'];
-    demos.forEach((d, i) => {
-      const coords = geocodeAddress(d.address);
-      saveIncident({
-        id:          Date.now() - (demos.length - i) * 86400000,
-        type:        d.type,
-        address:     d.address,
-        description: d.description,
-        lat:         coords[0],
-        lng:         coords[1],
-        date:        `${10 + i} ${months[i % 5]} 2025, 14:${String(i * 7 % 60).padStart(2,'0')}`,
-      });
-    });
+
+    const descriptionsByType = {
+      hurto: [
+        'Hurto de celular reportado en vía pública.',
+        'Robo de bicicleta en zona residencial durante la tarde.',
+        'Hurto de bolso a peatón cerca de zona comercial.',
+        'Reporte de robo de motocicleta estacionada sin vigilancia.',
+        'Hurto de elementos personales en transporte público.',
+        'Sustracción de billetera en punto de alta afluencia.',
+      ],
+      accidente: [
+        'Colisión menor entre vehículos sin heridos.',
+        'Accidente de tránsito por desaceleración repentina en vía principal.',
+        'Choque por alcance con daños materiales leves.',
+        'Accidente con objetos en la calzada, sin reporte de heridos.',
+        'Colisión en intersección con afectación parcial del carril.',
+        'Accidente de tránsito sin lesionados, tránsito lento en la zona.',
+      ],
+      vandalismo: [
+        'Daños reportados en mobiliario urbano.',
+        'Pintura y rayones en fachada de un inmueble.',
+        'Afectación de señalización vial por impacto reportado.',
+        'Vandalismo en paradero: ruptura de vidrio.',
+        'Daños en parque infantil y elementos de recreación.',
+        'Reporte de grafitis en muro de sector residencial.',
+      ],
+      atraco: [
+        'Ciudadano reporta intento de robo cerca de zona comercial.',
+        'Atraco a conductor en vía secundaria con solicitud de información.',
+        'Intento de hurto con intimidación en zona de alta circulación.',
+        'Atraco reportado cerca de establecimiento comercial.',
+        'Ataque y amenaza a peatón en horario nocturno.',
+        'Robos con intimidación durante desplazamiento hacia transporte.',
+      ],
+      otro: [
+        'Reporte ciudadano de situación sospechosa.',
+        'Observación de actividad inusual en sector residencial.',
+        'Reporte de riña entre personas sin lesionados.',
+        'Hallazgo de objeto abandonado en espacio público.',
+        'Reporte de comportamiento agresivo en zona común.',
+        'Ciudadano reporta aglomeración inusual y posible riesgo.',
+      ],
+    };
+
+    const states = ['En revisión', 'Confirmado', 'En proceso', 'Cerrado'];
+
+    const priorities = ['baja', 'media', 'alta'];
+
+    const incidentTypes = Object.keys(WEIGHTS);
+    const totalWeight = incidentTypes.reduce((sum, t) => sum + WEIGHTS[t], 0);
+
+    function pickType() {
+      const r = Math.random() * totalWeight;
+      let acc = 0;
+      for (const t of incidentTypes) {
+        acc += WEIGHTS[t];
+        if (r <= acc) return t;
+      }
+      return 'hurto';
+    }
+
+    // Rangos de fechas
+    // - hoy
+    // - últimos 7 días
+    // - últimos 30 días
+    // - últimos meses (60-180 días aprox)
+    const now = Date.now();
+
+    function pickDate() {
+      const bucket = Math.random();
+      let daysAgo;
+      if (bucket < 0.25) {
+        daysAgo = Math.floor(Math.random() * 1); // hoy
+      } else if (bucket < 0.55) {
+        daysAgo = Math.floor(Math.random() * 7);
+      } else if (bucket < 0.80) {
+        daysAgo = Math.floor(Math.random() * 30);
+      } else {
+        daysAgo = 60 + Math.floor(Math.random() * 120);
+      }
+
+      const dt = new Date(now - daysAgo * 86400000);
+
+      // Hora coherente (0-23) y minutos (0-59)
+      const hh = String(Math.floor(Math.random() * 24)).padStart(2, '0');
+      const mm = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+
+      dt.setHours(parseInt(hh, 10), parseInt(mm, 10), 0, 0);
+
+      // Formato similar al existente: "10 ene 2025, 14:30"
+      const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      const day = dt.getDate();
+      const month = months[dt.getMonth()];
+      const year = dt.getFullYear();
+
+      return `${day} ${month} ${year}, ${hh}:${mm}`;
+    }
+
+    function pickHourBucket() {
+      // sesgos de horario según tipo
+      const h = new Date().getHours();
+      return h;
+    }
+
+    // Para evitar repetir exactamente direcciones
+    function makeAddress(zoneLabel) {
+      const number = 1 + Math.floor(Math.random() * 160);
+      const streetType = Math.random() < 0.5 ? 'Cra' : 'Cll';
+      const baseStreet = 1 + Math.floor(Math.random() * 18);
+      const suffix = streetType === 'Cra' ? `${baseStreet}` : `${baseStreet}`;
+      // Ej: "Cra 12 # 34-56, Centro Chía"
+      const streetNum = `${streetType} ${suffix} # ${number}-${10 + Math.floor(Math.random() * 90)}`;
+      return `${streetNum}, ${zoneLabel}`;
+    }
+
+    function pickPriority(type) {
+      // Aumentar prioridad para atraco/accidente
+      const r = Math.random();
+      if (type === 'atraco') return r < 0.55 ? 'alta' : (r < 0.85 ? 'media' : 'baja');
+      if (type === 'accidente') return r < 0.35 ? 'alta' : (r < 0.75 ? 'media' : 'baja');
+      if (type === 'vandalismo') return r < 0.25 ? 'alta' : (r < 0.75 ? 'media' : 'baja');
+      if (type === 'hurto') return r < 0.25 ? 'alta' : (r < 0.70 ? 'media' : 'baja');
+      return r < 0.18 ? 'alta' : (r < 0.65 ? 'media' : 'baja');
+    }
+
+    // Generación principal
+    for (let idx = 0; idx < TARGET_COUNT; idx++) {
+      const type = pickType();
+      const zone = zones[Math.floor(Math.random() * zones.length)];
+
+      const address = makeAddress(zone.base);
+      const coords = geocodeAddress(address);
+
+      // pequeña variación adicional para dispersión
+      const lat = coords[0] + (zone.coordsBias[0] || 0) + (Math.random() - 0.5) * 0.0025;
+      const lng = coords[1] + (zone.coordsBias[1] || 0) + (Math.random() - 0.5) * 0.0025;
+
+      const descriptions = descriptionsByType[type] || descriptionsByType.otro;
+      const description = descriptions[Math.floor(Math.random() * descriptions.length)];
+
+      const date = pickDate();
+
+      const incident = {
+        id: Date.now() - idx * (2 + Math.floor(Math.random() * 3)) * 86400000 / 10,
+        type,
+        address,
+        description,
+        lat,
+        lng,
+        date,
+        status: states[Math.floor(Math.random() * states.length)],
+        priority: pickPriority(type),
+      };
+
+      saveIncident(incident);
+    }
+
+    // Limitar para no exceder el slice(0,200) que hace saveIncident
+    // (mantiene consistencia y rendimiento del mapa/lista)
   }
+
 
   /* ─────────────────────────────────────────────
      Bootstrap

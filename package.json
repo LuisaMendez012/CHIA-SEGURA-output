@@ -2,10 +2,12 @@
   "name": "chia-segura-output",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+"main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "serve"
+    "serve": "serve",
+    "dev": "node server.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,12 @@
     "url": "https://github.com/LuisaMendez012/CHIA-SEGURA-output/issues"
   },
   "homepage": "https://github.com/LuisaMendez012/CHIA-SEGURA-output#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.15"
+  },
   "devDependencies": {
     "serve": "^14.2.6"
   }

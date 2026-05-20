@@ -65,10 +65,92 @@
   <script src="js/toast.js"></script>
   <script src="js/navbar.js"></script>
   <script>
-    document.getElementById('contactForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      window.showToast && window.showToast('Mensaje enviado', 'Gracias por contactarnos', 'success');
-      this.reset();
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('contactForm');
+      if (!form) return;
+
+      const nameEl = document.getElementById('contactName');
+      const emailEl = document.getElementById('contactEmail');
+      const messageEl = document.getElementById('contactMessage');
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.textContent : 'Enviar';
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombre = (nameEl?.value || '').trim();
+        const correo = (emailEl?.value || '').trim();
+        const mensaje = (messageEl?.value || '').trim();
+
+        // Validaciones UX (también backend valida)
+        if (!nombre) {
+          window.showToast?.('⚠️ Nombre es requerido', 'Por favor ingresa tu nombre', 'error');
+          nameEl?.focus();
+          return;
+        }
+        if (!correo || !isValidEmail(correo)) {
+          window.showToast?.('⚠️ Correo inválido', 'Ingresa un correo válido', 'error');
+          emailEl?.focus();
+          return;
+        }
+        if (!mensaje) {
+          window.showToast?.('⚠️ Escribe un mensaje', 'No puede enviarse vacío', 'error');
+          messageEl?.focus();
+          return;
+        }
+
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `${originalBtnText} <span style="margin-left:10px;display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.65);border-top-color:#fff;border-radius:50%;animation:chia-spin 0.8s linear infinite;"></span>`;
+          }
+
+          if (!document.getElementById('chia-spin-style')) {
+            const st = document.createElement('style');
+            st.id = 'chia-spin-style';
+            st.textContent = '@keyframes chia-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+            document.head.appendChild(st);
+          }
+
+          window.showToast?.('⏳ Enviando mensaje', 'Espera un momento', 'info', '🕒', 1500);
+          console.log('[contacto] Enviando mensaje');
+
+          const API_BASE = (window.CHIA_API_BASE || '').toString().trim();
+          const apiUrl = API_BASE
+            ? `${API_BASE.replace(/\/+$/,'')}/contacto`
+            : `${window.location.origin}:3000/contacto`;
+
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, correo, mensaje }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok || !data.ok) {
+            const errMsg = data?.error || 'Error enviando mensaje';
+            throw new Error(errMsg);
+          }
+
+          console.log('[contacto] Mensaje enviado correctamente');
+          window.showToast?.('✅ Mensaje enviado correctamente', 'Mensaje enviado con éxito', 'success');
+          form.reset();
+        } catch (err) {
+          console.error('[contacto] Error enviando mensaje', err);
+          window.showToast?.('❌ Error enviando mensaje', err?.message || 'Intenta nuevamente', 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+          }
+        }
+      });
     });
   </script>
 </body>

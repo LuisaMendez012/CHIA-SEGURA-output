@@ -129,4 +129,38 @@
     observer.observe(el);
   });
 
+  /* ──────────────────────────────────────────────
+     HERO STATS – contadores animados
+  ────────────────────────────────────────────── */
+  const statNumbers = document.querySelectorAll('.hero-stat__number');
+  if (statNumbers && statNumbers.length) {
+    const statsObserver = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          statNumbers.forEach(el => {
+            const target = parseInt(el.getAttribute('data-target') || '0', 10);
+            const start = +el.textContent.replace(/[^0-9]/g, '') || 0;
+            const duration = 900;
+            const stepTime = Math.max(Math.floor(duration / Math.max(target,1)), 12);
+            let current = start;
+            const inc = target > 0 ? Math.ceil(target / (duration / stepTime)) : 1;
+            const timer = setInterval(() => {
+              current += inc;
+              if (current >= target) {
+                el.textContent = (target >= 100 ? `+${target}` : `${target}`);
+                clearInterval(timer);
+              } else {
+                el.textContent = (target >= 100 ? `+${current}` : `${current}`);
+              }
+            }, stepTime);
+          });
+          obs.disconnect();
+        }
+      });
+    }, { threshold: 0.2 });
+
+    const heroStats = document.querySelector('.hero__stats');
+    if (heroStats) statsObserver.observe(heroStats);
+  }
+
 })();
