@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto – Chía Segura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+</head>
+<body class="page--blue">
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="boton-panico.html">Pánico</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main style="padding:120px 24px 60px;">
+    <div class="container">
+      <h1>Contacto</h1>
+      <p>Escríbenos para dudas, colaboración o soporte académico.</p>
+
+      <form id="contactForm" style="max-width:640px;">
+        <div class="modal-field">
+          <input type="text" class="form-input" id="contactName" placeholder="Nombre" required />
+        </div>
+        <div class="modal-field">
+          <input type="email" class="form-input" id="contactEmail" placeholder="Correo electrónico" required />
+        </div>
+        <div class="modal-field">
+          <textarea class="form-input form-textarea" id="contactMessage" placeholder="Mensaje" required></textarea>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn--orange" type="submit">Enviar</button>
+          <button class="btn" type="reset">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer__container"><div class="footer__brand">Chía Segura</div><div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div><div class="footer__copy">© 2026 Todos los derechos reservados</div></div></footer>
+
+  <script src="./js/toast.js"></script>
+  <script src="./js/navbar.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('contactForm');
+      if (!form) return;
+
+      const nameEl = document.getElementById('contactName');
+      const emailEl = document.getElementById('contactEmail');
+      const messageEl = document.getElementById('contactMessage');
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.textContent : 'Enviar';
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombre = (nameEl?.value || '').trim();
+        const correo = (emailEl?.value || '').trim();
+        const mensaje = (messageEl?.value || '').trim();
+
+        // Validaciones obligatorias
+        if (!nombre) {
+          window.showToast?.('⚠️ Nombre es requerido', 'Por favor ingresa tu nombre', 'error');
+          nameEl?.focus();
+          return;
+        }
+        if (!correo || !isValidEmail(correo)) {
+          window.showToast?.('⚠️ Correo inválido', 'Ingresa un correo válido', 'error');
+          emailEl?.focus();
+          return;
+        }
+        if (!mensaje) {
+          window.showToast?.('⚠️ Escribe un mensaje', 'No puede enviarse vacío', 'error');
+          messageEl?.focus();
+          return;
+        }
+
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `${originalBtnText} <span style="margin-left:10px;display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.65);border-top-color:#fff;border-radius:50%;animation:chia-spin 0.8s linear infinite;"></span>`;
+          }
+
+          if (!document.getElementById('chia-spin-style')) {
+            const st = document.createElement('style');
+            st.id = 'chia-spin-style';
+            st.textContent = '@keyframes chia-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+            document.head.appendChild(st);
+          }
+
+          window.showToast?.('⏳ Guardando mensaje', 'Espera un momento', 'info', '🕒', 1500);
+          console.log('[contacto] Guardando mensaje en localStorage');
+
+          // Guardar en localStorage en lugar de hacer fetch
+          const contacts = JSON.parse(localStorage.getItem('chia_contacts') || '[]');
+          const newContact = {
+            id: Date.now(),
+            nombre,
+            correo,
+            mensaje,
+            fecha: new Date().toISOString()
+          };
+          contacts.push(newContact);
+          localStorage.setItem('chia_contacts', JSON.stringify(contacts));
+
+          console.log('[contacto] Mensaje guardado correctamente en localStorage');
+          window.showToast?.('✅ Mensaje guardado correctamente', 'Gracias por tu contacto', 'success');
+          form.reset();
+        } catch (err) {
+          console.error('[contacto] Error guardando mensaje', err);
+          window.showToast?.('❌ Error al guardar', err?.message || 'Intenta nuevamente', 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

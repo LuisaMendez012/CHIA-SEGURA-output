@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explorar Reportes – Chía Segura</title>
+  <meta name="description" content="Consulta, analiza y descarga reportes ciudadanos de manera organizada." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- CSS base -->
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/reportes.css" />
+
+  <!-- Chart / export libs (CDN) -->
+  <!-- Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <!-- PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="boton-panico.html">Pánico</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO PEQUEÑO -->
+  <section class="reportes-hero">
+    <div class="reportes-hero__overlay"></div>
+    <div class="container">
+      <div class="reportes-hero__content">
+        <div class="reportes-hero__top">
+          <h1 class="reportes-hero__title">Explorar Reportes</h1>
+          <p class="reportes-hero__sub">Consulta, analiza y descarga reportes ciudadanos de manera organizada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container reportes-main">
+
+    <!-- PANEL FILTROS -->
+    <section class="card reportes-filters" aria-label="Filtros de reportes">
+      <div class="reportes-filters__header">
+        <div>
+          <h2 class="card__title">Filtros</h2>
+          <p class="card__subtitle">Ajusta criterios para ver y exportar solo los reportes que necesitas.</p>
+        </div>
+
+        <div class="reportes-filters__actions">
+          <button class="btn btn--ghost" id="clearFiltersBtn" type="button">Limpiar filtros</button>
+        </div>
+      </div>
+
+      <div class="reportes-filters__grid">
+        <div class="form-field">
+          <label class="form-label" for="searchLocation">Buscar por ubicación</label>
+          <input id="searchLocation" class="form-input" type="text" placeholder="Ej: Centro, Cra 5" />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="categoryFilter">Categoría</label>
+          <select id="categoryFilter" class="form-input form-select">
+            <option value="all" selected>Todos</option>
+            <option value="hurto">Hurto</option>
+            <option value="atraco">Atraco</option>
+            <option value="vandalismo">Vandalismo</option>
+            <option value="accidente">Accidente</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="statusFilter">Estado</label>
+          <select id="statusFilter" class="form-input form-select">
+            <option value="all" selected>Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Revisado">Revisado</option>
+            <option value="Cerrado">Cerrado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="reportes-filters__footer">
+        <div class="filters-summary">
+          <span class="filters-summary__label">Resultados:</span>
+          <span class="filters-summary__value" id="filtersCount">0</span>
+        </div>
+
+        <div class="filters-summary__actions">
+          <button class="btn btn--orange" id="applyFiltersBtn" type="button">
+            Aplicar filtros
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLA -->
+    <section class="card reportes-table-card" aria-label="Tabla de reportes">
+      <div class="reportes-table-card__header">
+        <div>
+          <h2 class="card__title">Reportes</h2>
+          <p class="card__subtitle">Filtra y navega por páginas.</p>
+        </div>
+      </div>
+
+      <div class="table-wrap" id="tableWrap">
+        <table class="reportes-table" id="reportesTable">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Tipo</th>
+              <th>Ubicación</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Se llena por JavaScript -->
+          </tbody>
+        </table>
+
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state__icon">🛡️</div>
+          <div class="empty-state__title">No se encontraron reportes.</div>
+          <div class="empty-state__sub">Prueba ajustando los filtros.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="footer__container"><div class="footer__brand">Chía Segura</div><div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div><div class="footer__copy">© 2026 Todos los derechos reservados</div></div></footer>
+
+  <div id="tableLoading" style="display:none"></div>
+  <div id="pagination"></div>
+
+  <div id="exportLoading" style="display:none"></div>
+  <div id="exportMeta"></div>
+
+  <!-- Botones exportación (visibles si quieres activar la UI completa)
+       Si no existen en tu diseño, el JS los maneja pero aquí dejamos placeholders. -->
+
+
+  <button id="exportPdfFiltered" type="button" style="display:none"></button>
+  <button id="exportExcelFiltered" type="button" style="display:none"></button>
+  <button id="exportPdfAll" type="button" style="display:none"></button>
+  <button id="exportExcelAll" type="button" style="display:none"></button>
+
+  <script src="./js/toast.js"></script>
+  <script src="./js/navbar.js"></script>
+  <script src="./js/reportes.js"></script>
+</body>
+</html>
+

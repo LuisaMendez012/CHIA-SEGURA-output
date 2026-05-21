@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Botón de Pánico – Chía Segura</title>
+
+  <!-- Google Fonts: Nunito (matches project) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+
+  <style>
+    /* CSS Variables from the original file - maintaining all styling */
+    :root {
+      --orange:       #f97316;
+      --orange-dark:  #ea580c;
+      --orange-glow:  rgba(249,115,22,0.35);
+      --blue-dark:    #0f172a;
+      --blue-mid:     #1e293b;
+      --blue-card:    #1a2540;
+      --blue-border:  rgba(255,255,255,0.08);
+      --red:          #ef4444;
+      --red-dark:     #dc2626;
+      --red-glow:     rgba(239,68,68,0.45);
+      --green:        #22c55e;
+      --white:        #ffffff;
+      --text-main:    #f1f5f9;
+      --text-muted:   #94a3b8;
+      --text-dim:     #64748b;
+      --glass-bg:     rgba(30,41,59,0.65);
+      --glass-border: rgba(255,255,255,0.10);
+      --radius-lg:    16px;
+      --radius-xl:    24px;
+      --shadow-card:  0 8px 40px rgba(0,0,0,0.45);
+      --font:         'Nunito', sans-serif;
+      --transition:   all 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--blue-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(249,115,22,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(37,99,235,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(239,68,68,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero {
+      position: relative;
+      padding: 120px 24px 60px;
+      text-align: center;
+      z-index: 1;
+    }
+    .hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.28);
+      color: #fca5a5;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 5px 14px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero__title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 14px;
+    }
+    .hero__title span { color: var(--orange); }
+    .hero__subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto 8px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .legal-banner {
+      position: relative;
+      z-index: 1;
+      max-width: 660px;
+      margin: 0 auto 48px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.22);
+      border-radius: 12px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fcd34d;
+    }
+    .legal-banner__icon { flex-shrink: 0; }
+
+    .panic-section {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .panic-btn-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .panic-btn-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .panic-btn-ring {
+      position: relative;
+      width: 280px; height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panic-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(239,68,68,0.25);
+      animation: ring-expand 2.4s ease-out infinite;
+    }
+    .panic-ring:nth-child(1) { width: 280px; height: 280px; animation-delay: 0s; }
+    .panic-ring:nth-child(2) { width: 260px; height: 260px; animation-delay: 0.6s; }
+    .panic-ring:nth-child(3) { width: 240px; height: 240px; animation-delay: 1.2s; }
+
+    @keyframes ring-expand {
+      0%   { transform: scale(0.85); opacity: 0.9; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    .panic-btn {
+      position: relative;
+      z-index: 2;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 35% 35%, #ff6b6b, #ef4444 40%, #dc2626 75%, #991b1b);
+      box-shadow:
+        0 0 0 6px rgba(239,68,68,0.15),
+        0 0 0 12px rgba(239,68,68,0.08),
+        0 20px 60px rgba(239,68,68,0.5),
+        inset 0 -4px 12px rgba(0,0,0,0.35),
+        inset 0 4px 10px rgba(255,255,255,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s cubic-bezier(0.4,0,0.2,1), box-shadow 0.15s ease;
+      animation: panic-pulse 2s ease-in-out infinite;
+      outline: none;
+    }
+    .panic-btn:hover {
+      transform: scale(1.04);
+      box-shadow:
+        0 0 0 8px rgba(239,68,68,0.2),
+        0 0 0 16px rgba(239,68,68,0.1),
+        0 28px 70px rgba(239,68,68,0.65),
+        inset 0 -4px 12px rgba(0,0,0,0.35),
+        inset 0 4px 10px rgba(255,255,255,0.15);
+    }
+    .panic-btn:active {
+      transform: scale(0.96);
+      animation: none;
+    }
+
+    @keyframes panic-pulse {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(239,68,68,0.15), 0 0 0 12px rgba(239,68,68,0.08), 0 20px 60px rgba(239,68,68,0.5), inset 0 -4px 12px rgba(0,0,0,0.35); }
+      50%       { box-shadow: 0 0 0 10px rgba(239,68,68,0.22), 0 0 0 20px rgba(239,68,68,0.10), 0 28px 80px rgba(239,68,68,0.7), inset 0 -4px 12px rgba(0,0,0,0.35); }
+    }
+
+    .panic-btn__icon { color: #fff; opacity: 0.95; }
+    .panic-btn__text {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      line-height: 1.1;
+      text-align: center;
+    }
+    .panic-btn__sub {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(10,15,28,0.88);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .loading-overlay.active { display: flex; }
+
+    .loading-spinner {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 4px solid rgba(239,68,68,0.15);
+      border-top-color: var(--red);
+      animation: spin 0.85s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="boton-panico.html">Pánico</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <span class="hero__eyebrow">⚠️ SISTEMA DE EMERGENCIA</span>
+    <h1 class="hero__title">Botón de <span>Pánico</span></h1>
+    <p class="hero__subtitle">Sistema de alerta rápida para situaciones de riesgo inmediato en Chía.</p>
+  </section>
+
+  <div class="legal-banner">
+    <span class="legal-banner__icon">⚡</span>
+    <span>Úsalo solo en emergencias reales. Abuso del sistema es penalizado legalmente.</span>
+  </div>
+
+  <section class="panic-section">
+    <div class="panic-btn-wrapper">
+      <span class="panic-btn-label">Presiona para activar</span>
+      <div class="panic-btn-ring">
+        <div class="panic-ring"></div>
+        <div class="panic-ring"></div>
+        <div class="panic-ring"></div>
+        <button class="panic-btn" id="panicBtn">
+          <svg class="panic-btn__icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><path d="M12 8v4M12 16v.01"/><path d="M15 12h.01M9 12h.01"/>
+          </svg>
+          <span class="panic-btn__text">PÁNICO</span>
+          <span class="panic-btn__sub">Emergencia</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Activando sistema de emergencia...</div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./js/navbar.js"></script>
+  <script>
+    document.getElementById('panicBtn').addEventListener('click', () => {
+      alert('Sistema de pánico activado. Contactando autoridades...');
+    });
+  </script>
+</body>
+</html>

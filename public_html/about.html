@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nosotros – Chía Segura</title>
+  <meta name="description" content="Conoce al equipo detrás de Chía Segura, nuestra misión y visión para transformar la seguridad del municipio de Chía, Cundinamarca." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+
+  <style>
+    .page-hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+      padding: 120px 24px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    .page-hero__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .page-hero__title span { color: var(--orange); }
+    .page-hero__sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.75);
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar scrolled" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="index.html">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="about.html">Nosotros</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="services.html">Servicios</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="heatmap.html">Mapa de Calor</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ PAGE HERO ═══ -->
+  <section class="page-hero">
+    <h1 class="page-hero__title">Acerca de <span>Chía Segura</span></h1>
+    <p class="page-hero__sub">Somos un equipo de estudiantes de Ingeniería comprometidos con la seguridad y el bienestar de nuestra comunidad.</p>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span>Chía Segura</span>
+      </div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2026 Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <script src="./js/navbar.js"></script>
+</body>
+</html>

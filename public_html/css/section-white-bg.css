@@ -1,0 +1,9 @@
+/* Force white background for main landing sections (no layout changes) */
+
+#problema,
+#funcionalidades,
+#casos-uso,
+#como-funciona,
+.section--light {
+  background: #ffffff !important;
+}

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chía Segura – Reporte Ciudadano en Tiempo Real</title>
+  <meta name="description" content="Plataforma digital de reporte ciudadano en tiempo real para Chía, Cundinamarca. Reporta incidentes, visualiza el mapa de calor delictivo y contribuye a la seguridad de tu municipio." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+<link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/navbar.css" />
+  <link rel="stylesheet" href="./css/hero.css" />
+  <link rel="stylesheet" href="./css/components.css" />
+  <link rel="stylesheet" href="./css/premium-landing.css" />
+  <link rel="stylesheet" href="./css/section-white-bg.css" />
+  <link rel="stylesheet" href="./css/dash-cta.css" />
+
+
+
+
+
+  <!-- Leaflet (mini-mapa en modal) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* ── Modal scrollable y más grande ── */
+    .modal-backdrop .modal {
+      max-width: 680px !important;
+      width: 96vw !important;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal__body { overflow-y: auto; flex: 1; padding-bottom: 4px; }
+    .modal__body::-webkit-scrollbar { width: 4px; }
+    .modal__body::-webkit-scrollbar-track { background: transparent; }
+    .modal__body::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    /* ── Campo dirección con botón mapa ── */
+    .modal-location-row { display: flex; gap: 8px; align-items: stretch; }
+    .modal-location-row .form-input { flex: 1; }
+    .btn-locate {
+      background: rgba(249,115,22,0.15);
+      border: 1px solid rgba(249,115,22,0.3);
+      color: #fb923c;
+      border-radius: 10px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background .2s;
+      display: flex; align-items: center; justify-content: center;
+      white-space: nowrap;
+      min-width: 44px;
+    }
+    .btn-locate:hover { background: rgba(249,115,22,0.28); }
+    .btn-locate.active { background: #f97316; color: #fff; border-color: #f97316; }
+
+    /* ── Panel mini-mapa ── */
+    .modal-minimap-panel {
+      display: none;
+      margin-top: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(249,115,22,0.25);
+      background: #1e293b;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .modal-minimap-panel.visible { display: block; }
+
+    .minimap-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #162032;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .minimap-toolbar__hint {
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fb923c;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .minimap-toolbar__hint-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #f97316;
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    .minimap-toolbar__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .minimap-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px;
+      border-radius: 7px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px; font-weight: 700;
+      border: none; cursor: pointer; transition: all .2s;
+    }
+    .minimap-btn--gps {
+      background: rgba(37,99,235,0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(37,99,235,0.3);
+    }
+    .minimap-btn--gps:hover { background: rgba(37,99,235,0.28); }
+    .minimap-btn--clear {
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+    .minimap-btn--clear:hover { background: rgba(239,68,68,0.22); }
+
+    #modal-minimap { height: 320px; width: 100%; cursor: crosshair; }
+
+    .minimap-legend {
+      display: flex; align-items: center; gap: 14px;
+      padding: 9px 14px;
+      background: #162032;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      flex-wrap: wrap;
+    }
+    .minimap-legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px; color: #94a3b8;
+    }
+    .minimap-legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .minimap-legend-dot--pin { background: #f97316; }
+    .minimap-legend-dot--confirmed { background: #4ade80; }
+
+    /* ── Pill de ubicación confirmada ── */
+    .location-confirmed-pill {
+      display: none;
+      align-items: center; gap: 8px;
+      margin-top: 8px;
+      padding: 7px 12px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 700;
+      color: #4ade80;
+    }
+    .location-confirmed-pill.visible { display: flex; }
+    .location-confirmed-pill__coords {
+      font-weight: 600; color: #86efac; font-size: 11px; margin-left: auto;
+    }
+    .location-confirmed-pill__edit {
+      background: none; border: none; cursor: pointer;
+      color: #f59e0b; padding: 2px 6px; border-radius: 5px;
+      font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700;
+      transition: background .15s;
+    }
+    .location-confirmed-pill__edit:hover { background: rgba(245,158,11,0.15); }
+    .location-confirmed-pill__del {
+      background: none; border: none; cursor: pointer;
+      color: #f87171; padding: 2px 4px; border-radius: 5px;
+      transition: background .15s; display: flex; align-items: center;
+    }
+    .location-confirmed-pill__del:hover { background: rgba(239,68,68,0.12); }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__container">
+      <a class="navbar__brand" href="index.html">
+        <div class="navbar__logo-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="navbar__brand-text">Chía Segura</span>
+      </a>
+
+      <ul class="navbar__menu" id="navMenu" role="menubar">
+        <li role="none"><a class="navbar__link" role="menuitem" href="#inicio">Inicio</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="mapa.html">Mapa</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="boton-panico.html">Pánico</a></li>
+        <li role="none"><a class="navbar__link" role="menuitem" href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <button class="navbar__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero hero-home" id="inicio">
+    <div class="hero__overlay"></div>
+    <div class="hero__content">
+      <h1 class="hero__title">
+        Chía Segura: <br />
+        <span>Reportes Ciudadanos en Tiempo Real</span>
+      </h1>
+      <p class="hero__subtitle">
+        Una plataforma digital para reportar incidentes de seguridad, movilidad y riesgos urbanos,
+        facilitando una respuesta más rápida y una mejor gestión municipal.
+      </p>
+
+      <div class="hero__actions" style="margin-bottom:18px;">
+        <button class="btn btn--orange" id="openModal">Reportar incidente</button>
+<a href="reportes.html" class="btn btn--outline" style="margin-left:12px;">Explorar reportes</a>
+      </div>
+
+
+    </div>
+  </section>
+
+
+
+  <!-- ═══ PROBLEMA ═══ -->
+  <section class="section" id="problema">
+    <div class="container">
+      <div class="problem-layout">
+        <div class="problem-layout__left">
+          <div class="kicker">EL PROBLEMA</div>
+          <h2 class="problem-layout__title">¿Qué está pasando en nuestra comunidad?</h2>
+          <p class="problem-layout__desc">
+            La falta de canales oportunos y eficientes para reportar incidentes urbanos dificulta la respuesta de las autoridades y afecta la seguridad ciudadana.
+            Muchos eventos no son registrados correctamente, la información llega tarde o no cuenta con ubicación precisa, limitando la capacidad de reacción y monitoreo territorial.
+          </p>
+
+          <div class="problem-mini-cards" role="list" aria-label="Causas del problema">
+            <div class="problem-mini-card" role="listitem">
+              <div class="problem-mini-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div class="problem-mini-card__body">
+                <div class="problem-mini-card__title">Reportes tardíos o dispersos</div>
+                <div class="problem-mini-card__text">La información no siempre llega a tiempo o se encuentra fragmentada.</div>
+              </div>
+            </div>
+
+            <div class="problem-mini-card" role="listitem">
+              <div class="problem-mini-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div class="problem-mini-card__body">
+                <div class="problem-mini-card__title">Ubicación imprecisa</div>
+                <div class="problem-mini-card__text">Muchos incidentes no cuentan con geolocalización clara.</div>
+              </div>
+            </div>
+
+            <div class="problem-mini-card" role="listitem">
+              <div class="problem-mini-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                  <path d="M3 3h18v18H3z" opacity="0"/>
+                  <path d="M4 19V5"/>
+                  <path d="M4 19h16"/>
+                  <path d="M8 17l3-7 4 5 3-8"/>
+                  <path d="M14 10h7" opacity="0"/>
+                  <path d="M12 16l-1 3" opacity="0"/>
+                  <path d="M6 15l2-6 4 8 3-6 3 8" opacity="0"/>
+                  <path d="M9 14l2-3 2 2 2-4"/>
+                  <path d="M12 12h0"/>
+                  <path d="M20 10l-4 10" opacity="0"/>
+                  <path d="M2 12h0" opacity="0"/>
+                  <path d="M12 2h0" opacity="0"/>
+                  <path d="M3 21l0 0" opacity="0"/>
+                  <path d="M4 4l0 0" opacity="0"/>
+                  <path d="M9 11l3 2" opacity="0"/>
+                  <path d="M20 10l-4 10"/>
+                  <path d="M16 20l4 0" opacity="0"/>
+                </svg>
+              </div>
+              <div class="problem-mini-card__body">
+                <div class="problem-mini-card__title">Falta de análisis</div>
+                <div class="problem-mini-card__text">No se identifican patrones ni zonas críticas fácilmente.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="problem-layout__right">
+          <div class="dashboard-mock" aria-label="Mockup de dashboard">
+            <div class="dashboard-mock__header">
+              <div class="dashboard-mock__title">Panel de monitoreo</div>
+              <div class="dashboard-mock__status">
+                <span class="dot dot--orange" aria-hidden="true"></span>
+                <span>Actualización en tiempo real</span>
+              </div>
+            </div>
+
+            <div class="dashboard-mock__grid">
+              <div class="dash-card">
+                <div class="dash-card__label">Incidentes</div>
+                <div class="dash-card__value">160</div>
+                <div class="dash-card__meta">Últimos 30 días</div>
+              </div>
+              <div class="dash-card">
+                <div class="dash-card__label">Zonas críticas</div>
+                <div class="dash-card__value">3</div>
+                <div class="dash-card__meta">Con mayor incidencia</div>
+              </div>
+              <div class="dash-cta">
+                <div class="dash-cta__kicker">Visualiza el mapa de incidentes</div>
+                <div class="dash-cta__text">Consulta los reportes ciudadanos en tiempo real y explora zonas con mayor actividad en Chía.</div>
+                <a href="mapa.html" class="btn btn--orange dash-cta__btn">Ver mapa de calor</a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- ═══ FUNCIONALIDADES ═══ -->
+  <section class="section" id="funcionalidades">
+    <div class="container">
+      <div class="solution-title">
+        <div class="kicker">NUESTRA SOLUCIÓN</div>
+        <h2 class="problem-layout__title" style="margin-top: 10px;">Funcionalidades principales</h2>
+
+        <div class="solution-text-media">
+          <p class="problem-layout__desc solution-text-media__text" style="margin-bottom: 0;">
+            Herramientas diseñadas para fortalecer el monitoreo urbano, facilitar el reporte ciudadano y apoyar la toma de decisiones mediante información en tiempo real.
+          </p>
+          <div class="solution-text-media__img" aria-hidden="true">
+            <div class="solution-illus">
+              <div class="solution-illus__ring"></div>
+              <div class="solution-illus__bars">
+                <span></span><span></span><span></span>
+                <span></span><span></span>
+              </div>
+              <div class="solution-illus__map">
+                <span class="solution-illus__pin"></span>
+                <span class="solution-illus__pin solution-illus__pin--2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="features-main-grid" role="list" aria-label="Funcionalidades principales">
+        <div class="feature-main-card" role="listitem">
+          <div class="feature-main-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="14" y2="17"/>
+            </svg>
+          </div>
+          <div class="feature-main-card__body">
+            <div class="feature-main-card__title">Reporta fácilmente</div>
+            <div class="feature-main-card__desc">Registra incidentes rápidamente con ubicación, descripción y evidencia.</div>
+          </div>
+        </div>
+
+        <div class="feature-main-card" role="listitem">
+          <div class="feature-main-card__icon feature-main-card__icon--blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="feature-main-card__body">
+            <div class="feature-main-card__title">Geolocalización precisa</div>
+            <div class="feature-main-card__desc">Ubicación automática de reportes para mayor precisión territorial.</div>
+          </div>
+        </div>
+
+        <div class="feature-main-card" role="listitem">
+          <div class="feature-main-card__icon feature-main-card__icon--orange" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <line x1="12" y1="20" x2="12" y2="10"/>
+              <line x1="18" y1="20" x2="18" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="16"/>
+              <rect x="4" y="4" width="16" height="16" rx="2" ry="2" opacity="0"/>
+            </svg>
+          </div>
+          <div class="feature-main-card__body">
+            <div class="feature-main-card__title">Visualización inteligente</div>
+            <div class="feature-main-card__desc">Dashboards interactivos para detectar patrones y zonas críticas.</div>
+          </div>
+        </div>
+
+        <div class="feature-main-card" role="listitem">
+          <div class="feature-main-card__icon feature-main-card__icon--green" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="feature-main-card__body">
+            <div class="feature-main-card__title">Seguimiento en tiempo real</div>
+            <div class="feature-main-card__desc">Monitorea incidentes y recibe actualizaciones constantemente.</div>
+          </div>
+        </div>
+
+        <div class="feature-main-card" role="listitem">
+          <div class="feature-main-card__icon feature-main-card__icon--navy" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="feature-main-card__body">
+            <div class="feature-main-card__title">Apoyo a decisiones</div>
+            <div class="feature-main-card__desc">Información centralizada para fortalecer la gestión territorial.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══ FOOTER ═══ -->
+
+
+
+  <!-- ═══ CASOS DE USO ═══ -->
+  <section class="section" id="casos-uso">
+    <div class="container">
+      <h2 class="section__title">¿Quiénes pueden beneficiarse del sistema?</h2>
+      <p class="section__subtitle">Herramientas pensadas para distintos actores urbanos que requieren datos confiables y oportunos.</p>
+
+      <div class="usecases-grid">
+        <div class="usecase-card">
+          <div class="usecase-card__icon">👥</div>
+          <div class="usecase-card__title">Ciudadanos</div>
+          <div class="usecase-card__desc">Reportar incidentes urbanos y consultar eventos cercanos en tiempo real.</div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-card__icon">🏛️</div>
+          <div class="usecase-card__title">Administración municipal</div>
+          <div class="usecase-card__desc">Monitorear zonas críticas y priorizar acciones de intervención.</div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-card__icon">👮</div>
+          <div class="usecase-card__title">Entidades de seguridad</div>
+          <div class="usecase-card__desc">Analizar patrones de incidentes para optimizar tiempos de respuesta.</div>
+        </div>
+        <div class="usecase-card">
+          <div class="usecase-card__icon">🗺️</div>
+          <div class="usecase-card__title">Planeación territorial</div>
+          <div class="usecase-card__desc">Identificar tendencias urbanas mediante análisis de datos históricos.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__brand">
+        <div class="navbar__logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span>Chía Segura</span>
+      </div>
+      <div class="footer__center">Facultad de Ingeniería – Universidad de Cundinamarca</div>
+      <div class="footer__copy">© 2026 Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <!-- ═══ TOAST ═══ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══ MODAL – Reportar Incidente ═══ -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__header">
+        <h3 class="modal__title" id="modalTitle">Reportar Incidente</h3>
+        <button class="modal__close" id="closeModal" aria-label="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <input type="text" class="form-input" id="reportName" placeholder="Nombre *" required />
+        </div>
+
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <input type="text" class="form-input" id="reportLastName" placeholder="Apellido *" required />
+        </div>
+
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+          </div>
+          <input type="text" class="form-input" id="reportCedula" placeholder="Cédula *" inputmode="numeric" required />
+        </div>
+
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <input type="email" class="form-input" id="reportEmail" placeholder="Correo electrónico *" required />
+        </div>
+
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <select class="form-input form-select" id="reportType" required>
+            <option value="" disabled selected>Tipo de delito</option>
+            <option value="hurto">Hurto</option>
+            <option value="atraco">Atraco</option>
+            <option value="vandalismo">Vandalismo</option>
+            <option value="accidente">Accidente de tránsito</option>
+            <option value="otro">Otro</option>
+          </select>
+          <div class="select-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <!-- UBICACIÓN -->
+        <div class="modal-field">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="modal-location-row">
+            <input type="text" class="form-input" id="reportAddress" placeholder="Dirección del incidente * (ej: Cra 5 # 10-20, Centro)" required />
+            <button type="button" class="btn-locate" id="btnToggleMinimap" title="Seleccionar en el mapa">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </button>
+          </div>
+
+          <div class="modal-minimap-panel" id="minimapPanel">
+            <div class="minimap-toolbar">
+              <div class="minimap-toolbar__hint">
+                <div class="minimap-toolbar__hint-dot"></div>
+                Toca el mapa para marcar la ubicación
+              </div>
+              <div class="minimap-toolbar__actions">
+                <button type="button" class="minimap-btn minimap-btn--gps" id="btnMinimapGPS">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+                  Mi ubicación
+                </button>
+                <button type="button" class="minimap-btn minimap-btn--clear" id="btnMinimapClear">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Borrar pin
+                </button>
+              </div>
+            </div>
+            <div id="modal-minimap"></div>
+            <div class="minimap-legend">
+              <div class="minimap-legend-item">
+                <div class="minimap-legend-dot minimap-legend-dot--pin"></div>
+                Tu ubicación seleccionada
+              </div>
+              <div class="minimap-legend-item">
+                <div class="minimap-legend-dot minimap-legend-dot--confirmed"></div>
+                Incidentes previos
+              </div>
+            </div>
+          </div>
+
+          <div class="location-confirmed-pill" id="locationPill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Ubicación marcada en el mapa
+            <span class="location-confirmed-pill__coords" id="pillCoords"></span>
+            <button type="button" class="location-confirmed-pill__edit" id="btnPillEdit">Editar</button>
+            <button type="button" class="location-confirmed-pill__del" id="btnPillDel" title="Eliminar pin">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <div class="input-icon input-icon--top">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <textarea class="form-input form-textarea" id="reportDesc" placeholder="Descripción del incidente *" required></textarea>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--orange btn--full" id="submitReport">Enviar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCRIPTS ═══ -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Firebase (opcional) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="./config/firebase.js"></script>
+  <!-- EmailJS (opcional) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="./config/emailjs.js"></script>
+
+  <script src="./js/toast.js"></script>
+  <script src="./js/navbar.js"></script>
+  <script src="./js/animations.js"></script>
+  <script src="./js/modal.js"></script>
+</body>
+</html>

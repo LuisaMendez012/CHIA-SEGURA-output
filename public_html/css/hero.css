@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════════
+   hero.css – Sección Hero
+   ═══════════════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0b1f39;
+}
+
+.hero-home,
+.hero-mapa {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.hero-home {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg');
+}
+
+.hero-mapa {
+  /* Imagen separada para el mapa, puede cambiarse sin afectar el hero principal */
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Chia_-_panoramio_%281%29.jpg');
+}
+
+/* ─── OVERLAY ────────────────────────────────── */
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(11,31,58,.65) 0%,
+    rgba(11,31,58,.60) 50%,
+    rgba(11,31,58,.70) 100%
+  );
+  backdrop-filter: brightness(.88);
+}
+
+/* Decorative dots pattern */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* ─── CONTENT ────────────────────────────────── */
+.hero__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 780px;
+  padding: 100px 24px 60px;
+  animation: fadeInUp .8s ease both;
+}
+
+/* Alineación explícita para centrar botones y contenido internamente */
+.hero__content { display: flex; flex-direction: column; align-items: center; }
+
+.hero__title {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.2;
+  margin-bottom: 20px;
+  letter-spacing: -.02em;
+}
+
+.hero__title span {
+  display: block;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 800;
+}
+
+.hero__subtitle {
+  font-size: clamp(.95rem, 2vw, 1.15rem);
+  color: rgba(255,255,255,.82);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+/* ──────────────────────────────────────────────
+   HERO STATS (pequeñas tarjetas dentro del hero)
+   ────────────────────────────────────────────── */
+/* Contenedor de acciones dentro del hero */
+.hero__actions { display: flex; gap: 12px; justify-content: center; align-items: center; }
+
+
+/* ─── SCROLL INDICATOR ───────────────────────── */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 40px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 12px;
+  animation: fadeIn 1.5s ease 1s both;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 600px) {
+  .hero__title { font-size: 2rem; }
+  .hero__title span { font-size: 1.75rem; }
+  .hero__subtitle { font-size: .9rem; }
+}
